@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Station demo</title>
+    <link rel="stylesheet" href="./station.css" />
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+  </head>
+  <body>
+    <h1 id="station_name"></h1>
+    <p id="server_time"></p>
+    <table id="customers">
+      <tr>
+        <th>Thông số</th>
+        <th id="value000">Giá trị</th>
+      </tr>
+      <tr>
+        <td>Điện áp Grid1</td>
+        <td id="value001"></td>
+      </tr>
+      <tr>
+        <td>Điện áp Grid2</td>
+        <td id="value002"></td>
+      </tr>
+      <tr>
+        <td>Điện áp Grid3</td>
+        <td id="value003"></td>
+      </tr>
+      <tr>
+        <td>Điện áp Gen1</td>
+        <td id="value004"></td>
+      </tr>
+      <tr>
+        <td>Điện áp Gen2</td>
+        <td id="value005"></td>
+      </tr>
+    </table>
+
+    <script>
+      let socket = io("http://localhost:8080");
+      var station_id = localStorage.getItem("station_id");
+      let el;
+
+      //Socket server to client
+      socket.on("time", (timeString) => {
+        let el = document.getElementById("server_time");
+        el.innerHTML = "Server time " + timeString;
+      });
+      socket.on("data_station" + station_id, (newValue) => {
+        handleData(newValue);
+      });
+
+      //Get data for the first load
+      getData = async () => {
+        axios
+          .get("http://localhost:8080/stations/" + station_id)
+          .then((response) => {
+            console.log("response:", response);
+            let lastValue = response.data;
+            let station_name = document.getElementById("station_name");
+            station_name.innerHTML = localStorage.getItem("station_name");
+            handleData(lastValue);
+          })
+          .catch((error) => {
+            if (error) {
+              console.log(error);
+            } else {
+              console.log(error.message);
+            }
+          });
+      };
+      getData();
+
+      //Handle Data
+      handleData = (values) => {
+        let el001 = document.getElementById("value001");
+        el001.innerHTML = values.value001;
+        let el002 = document.getElementById("value002");
+        el002.innerHTML = values.value002;
+        let el003 = document.getElementById("value003");
+        el003.innerHTML = values.value003;
+        let el004 = document.getElementById("value004");
+        el004.innerHTML = values.value004;
+        let el005 = document.getElementById("value005");
+        el005.innerHTML = values.value005;
+      };
+    </script>
+  </body>
+</html>
