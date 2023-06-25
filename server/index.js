@@ -56,13 +56,27 @@ client.on("message", async (topic_mqtt, message) => {
 });
 
 // Connect to client by socket io
-io.on("connection", (client) => {
-  console.log("Client connected" + client.id);
+io.on("connection", (clientWeb) => {
+  console.log("Client connected" + clientWeb.id);
+  clientWeb.on("CurrentControl", async (data) => {
+    console.log(data);
+    await stations.findOneAndUpdate(
+      { station_id: data.station_id },
+      { status_currentcontrol: data.status_currentcontrol },
+      { new: true }
+    );
+    sendToDevice("CurrentControl" + data.station_id, data);
+  });
 });
 
 //Function
 sendDataToClient = async (topic, msg) => {
   io.emit(topic, msg);
+};
+
+sendToDevice = async (topic, message) => {
+  let data = JSON.stringify(message);
+  await client.publish(topic, data);
 };
 
 setInterval(() => {
@@ -80,5 +94,6 @@ app.get("/stations/:station_id", async (req, res) => {
   var thisStation = await stations.findOne({ station_id: station_id });
   var lastValue =
     thisStation.station_values[thisStation.station_values.length - 1];
-  return res.status(200).json(lastValue);
+  var status_currentcontrol = thisStation.status_currentcontrol;
+  return res.status(200).json({ lastValue, status_currentcontrol });
 });
