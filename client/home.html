@@ -21,8 +21,13 @@
     getListStations = async () => {
       console.log("HTTP GET with Axios");
       axios
-        .get("http://localhost:8080/stations")
+        .get("http://localhost:8080/stations", {
+          headers: { "auth-token": localStorage.getItem("auth-token") },
+        })
         .then((response) => {
+          if (response.data === false) {
+            window.location.href = "login.html";
+          }
           let listStations = response.data;
           handleData(listStations);
         })

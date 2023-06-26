@@ -66,9 +66,13 @@
       //Get data for the first load
       getData = async () => {
         axios
-          .get("http://localhost:8080/stations/" + station_id)
+          .get("http://localhost:8080/stations/" + station_id, {
+            headers: { "auth-token": localStorage.getItem("auth-token") },
+          })
           .then((response) => {
-            console.log("response:", response);
+            if (response.data === false) {
+              window.location.href = "login.html";
+            }
             let lastValue = response.data.lastValue;
             let status_currentcontrol = response.data.status_currentcontrol;
             let station_name = document.getElementById("station_name");

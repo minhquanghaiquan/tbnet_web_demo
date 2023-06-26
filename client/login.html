@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./login.css" />
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <title>Form login</title>
+  </head>
+  <body>
+    <div class="row">
+      <div class="colm-form">
+        <h2>LOGIN</h2>
+        <div class="form-container">
+          <input
+            type="text"
+            placeholder="Email address or username"
+            id="username"
+          />
+          <input type="password" placeholder="Password" id="password" />
+          <button class="btn-login" id="loginButton">Login</button>
+          <!-- <a href="#">Forgotten password?</a>
+          <button class="btn-new">Create new Account</button> -->
+        </div>
+      </div>
+    </div>
+  </body>
+  <script>
+    var loginButton = document.getElementById("loginButton");
+    var userNameInput = document.getElementById("username");
+    var passwordInput = document.getElementById("password");
+    var username = "";
+    var password = "";
+
+    userNameInput.addEventListener("input", (e) => {
+      username = e.target.value;
+    });
+    passwordInput.addEventListener("input", (e) => {
+      password = e.target.value;
+    });
+
+    loginButton.addEventListener("click", (req, res) => {
+      axios
+        .post("http://localhost:8080/login", { username, password })
+        .then(function (res) {
+          localStorage.setItem("auth-token", res.data.token);
+          window.location.href = "home.html";
+        })
+        .catch(function (error) {
+          alert(error.response.data);
+        });
+    });
+  </script>
+</html>
