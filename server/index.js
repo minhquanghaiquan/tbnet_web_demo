@@ -1,5 +1,6 @@
 require("dotenv").config();
-const app = require("express")();
+const express = require("express");
+const app = express();
 const server = require("http").createServer(app);
 const mongoose = require("mongoose");
 const shortId = require("shortid");
@@ -28,6 +29,8 @@ app.options("*", cors());
 const stations = require("./models/stationsModel");
 const listStations = require("./models/listStationsModel");
 const users = require("./models/userModel");
+
+app.use("/public", express.static("public"));
 
 //Create server
 server.listen(port_server, async () => {
