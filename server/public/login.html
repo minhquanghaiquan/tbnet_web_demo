@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="./login.css" />
+    <link rel="stylesheet" href="./style/login.css" />
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <title>Form login</title>
   </head>
@@ -12,22 +12,31 @@
     <div class="row">
       <div class="colm-form">
         <h2>LOGIN</h2>
-        <div class="form-container">
-          <input
-            type="text"
-            placeholder="Email address or username"
-            id="username"
-          />
-          <input type="password" placeholder="Password" id="password" />
-          <button class="btn-login" id="loginButton">Login</button>
-          <!-- <a href="#">Forgotten password?</a>
+        <form id="form1">
+          <div class="form-container">
+            <input
+              type="text"
+              placeholder="Email address or username"
+              id="username"
+            />
+            <input type="password" placeholder="Password" id="password" />
+            <button
+              class="btn-login"
+              id="loginButton"
+              type="submit"
+              form="form1"
+            >
+              Login
+            </button>
+            <!-- <a href="#">Forgotten password?</a>
           <button class="btn-new">Create new Account</button> -->
-        </div>
+          </div>
+        </form>
       </div>
     </div>
   </body>
   <script>
-    var loginButton = document.getElementById("loginButton");
+    var form1 = document.getElementById("form1");
     var userNameInput = document.getElementById("username");
     var passwordInput = document.getElementById("password");
     var username = "";
@@ -40,7 +49,8 @@
       password = e.target.value;
     });
 
-    loginButton.addEventListener("click", (req, res) => {
+    form1.addEventListener("submit", (event) => {
+      event.preventDefault();
       axios
         .post("http://localhost:8080/login", { username, password })
         .then(function (res) {

@@ -12,16 +12,21 @@ const io = require("socket.io")(server, {
 });
 const mqtt = require("mqtt");
 const cors = require("cors");
-
 var bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-const port_server = process.env.PORT_SERVER;
-const client = mqtt.connect(process.env.HOST_MQTT);
 const topic_mqtt = process.env.TOPIC_MQTT;
 const host_mongodb = process.env.HOST_MONGODB;
 const key_token = process.env.KEY_TOKEN;
+const username_mqtt = process.env.USERNAME_MQTT;
+const password_mqtt = process.env.PASSWORD_MQTT;
+
+const port_server = process.env.PORT_SERVER;
+const client = mqtt.connect(process.env.HOST_MQTT, {
+  username: username_mqtt,
+  password: password_mqtt,
+});
 
 app.use(cors());
 app.options("*", cors());
@@ -55,6 +60,7 @@ client.on("connect", async () => {
 client.on("message", async (topic_mqtt, message) => {
   var data = message.toString();
   data = JSON.parse(data);
+  console.log(data);
   data.created = new Date().toTimeString();
   data._id = shortId.generate();
   await stations.findOneAndUpdate(
