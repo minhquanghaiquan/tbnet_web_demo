@@ -15,6 +15,8 @@ const users = new Schema({
     type: String,
     required: true,
   },
+  resetToken: String,
+  expireToken: Date,
 });
 
 module.exports = mongoose.model("user", users);

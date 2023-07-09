@@ -3,11 +3,21 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
-    <link rel="stylesheet" href="./style/home.css" />
+    <base href="http://localhost:8080/public/" target="_parent" />
+    <link rel="stylesheet" href="style/liststation.css" />
+    <link rel="shortcut icon" href="img/logo-web.png" />
+    <title>TB NET - List Station</title>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   </head>
   <body>
+    <div class="header-table">
+      <h1>Danh sách trạm</h1>
+      <div class="button-logout">
+        <button class="custom-button-fill" id="logoutButton">
+          <span class="button-fill-text">Logout</span>
+        </button>
+      </div>
+    </div>
     <table id="customers">
       <tr>
         <th>Trạm</th>
@@ -26,8 +36,7 @@
         })
         .then((response) => {
           if (response.data === false) {
-            console.l;
-            window.location.href = "http://localhost:8080/public/login.html";
+            window.location.href = "login.html";
           }
           let listStations = response.data;
           handleData(listStations);
@@ -67,5 +76,12 @@
         tableElement.appendChild(tr);
       });
     };
+
+    //logout
+    var logoutButton = document.getElementById("logoutButton");
+    logoutButton.addEventListener("click", () => {
+      localStorage.removeItem("auth-token");
+      window.location.href = "index.html";
+    });
   </script>
 </html>

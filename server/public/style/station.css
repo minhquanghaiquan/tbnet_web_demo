@@ -16,14 +16,20 @@
   #customers th {
     padding-top: 12px;
     padding-bottom: 12px;
-    text-align: left;
-    background-color: #04AA6D;
+    /* text-align: left; */
+    background-color: #ed143d;
     color: white;
   }
 
-  h1 {
-    color: #5766ae;
-}
+  h1{
+    font-size: 30px;
+    color: #ed143d;
+    text-transform: uppercase;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 15px;
+    font-family: 'Roboto', sans-serif;
+  }
 
 /* toggle in label designing */
 
@@ -32,9 +38,9 @@
     display: inline-block;
     width: 100px;
     height: 52px;
-    background-color: #ccc;
+    background-color: #ffffff;
     border-radius: 30px;
-    border: 2px solid #5766ae;
+    border: 2px solid #ed143d;
 }
 
 /* After slide changes */
@@ -45,7 +51,7 @@
     width: 50px;
     height: 50px;
     border-radius: 50%;
-    background-color: #5766ae;
+    background-color: #ed143d;
     top: 1px;
     left: 1px;
     transition: all 0.5s;
@@ -67,7 +73,7 @@ p {
 /* Checkbox checked toggle label bg color */
 
 .checkbox:checked+.toggle {
-    background-color: #00afd3;
+    background-color: #eb6d85;
 }
 
 /* Checkbox vanished */
@@ -78,12 +84,12 @@ p {
 
 .div {
     display: block;
-    height: 30%;
-    width: 35%;
+    /* height: 30%;
+    width: 35%; */
     text-align: center;
     margin: 20px auto;
-    background-color: #00afd3;
-    box-shadow: 1px 1px 7px 5px #5766ae;
+    /* background-color: #00afd3;
+    box-shadow: 1px 1px 7px 5px #5766ae; */
 }
 
 .heading1 {
@@ -99,3 +105,59 @@ p {
     font-weight: bold;
     margin-bottom: -10;
 }
+
+/* button */
+.custom-button-fill {
+    align-items: center;
+    justify-content: center;
+    padding: 15px 25px;
+    border-radius: 10px;
+    gap: 6px;
+    background: #ed143d;
+    border: 2px solid transparent;
+  }
+  
+  .custom-button-fill:hover {
+    position: relative;
+    background: linear-gradient(white, white) padding-box, linear-gradient(to right, #ed143d, #ed143d) border-box;
+    cursor: pointer;
+  }
+  
+  .custom-button-fill:hover::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: -1;
+    border-radius: inherit;
+    background: linear-gradient(90deg, #ed143d 0%, #ed143d 100%);
+  }
+  
+  .custom-button-fill .button-fill-text {
+    font-weight: 600;
+    font-size: 18px;
+    line-height: 21px;
+    color: #fff;
+  }
+  
+  .custom-button-fill:hover .button-fill-text {
+    background: linear-gradient(90deg, #ed143d 0%, #ed143d 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  
+  .custom-button-fill .button-fill-icon {
+    color: #fff;
+  }
+  
+  .custom-button-fill:hover .button-fill-icon {
+    color: #ed143d;
+  }
+  
+  .header-table {
+    display: grid;
+    grid-template-columns: 90% 10%;
+  
+  }

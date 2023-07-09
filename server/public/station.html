@@ -3,13 +3,22 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Station demo</title>
-    <link rel="stylesheet" href="./style/station.css" />
+    <base href="http://localhost:8080/public/" target="_parent" />
+    <link rel="stylesheet" href="style/station.css" />
+    <link rel="shortcut icon" href="img/logo-web.png" />
+    <title>TB NET - Station</title>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
   </head>
   <body>
-    <h1 id="station_name"></h1>
+    <div class="header-table">
+      <h1 id="station_name"></h1>
+      <div class="button-logout">
+        <button class="custom-button-fill" id="logoutButton">
+          <span class="button-fill-text">Logout</span>
+        </button>
+      </div>
+    </div>
     <p id="server_time"></p>
     <table id="customers">
       <tr>
@@ -71,7 +80,7 @@
           })
           .then((response) => {
             if (response.data === false) {
-              window.location.href = "http://localhost:8080/public/login.html";
+              window.location.href = "login.html";
             }
             let lastValue = response.data.lastValue;
             let status_currentcontrol = response.data.status_currentcontrol;
@@ -136,6 +145,13 @@
         console.log(data);
         socket.emit("CurrentControl", data);
       };
+
+      //logout
+      var logoutButton = document.getElementById("logoutButton");
+      logoutButton.addEventListener("click", () => {
+        localStorage.removeItem("auth-token");
+        window.location.href = "index.html";
+      });
     </script>
   </body>
 </html>

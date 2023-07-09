@@ -1,0 +1,92 @@
+#customers {
+    font-family: Arial, Helvetica, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+  }
+  
+  #customers td, #customers th {
+    border: 1px solid #ddd;
+    padding: 8px;
+  }
+  
+  #customers tr:nth-child(even){background-color: #f2f2f2;}
+  
+  #customers tr:hover {background-color: #ddd;}
+  
+  #customers th {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    background-color: #ed143d;
+    color: white;
+  }
+
+  h1{
+    font-size: 30px;
+    color: #ed143d;
+    text-transform: uppercase;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 15px;
+    font-family: 'Roboto', sans-serif;
+  }
+
+  a {
+    text-decoration: none;
+    color: black;
+  }
+
+   /* button */
+ .custom-button-fill {
+  align-items: center;
+  justify-content: center;
+  padding: 15px 25px;
+  border-radius: 10px;
+  gap: 6px;
+  background: #ed143d;
+  border: 2px solid transparent;
+}
+
+.custom-button-fill:hover {
+  position: relative;
+  background: linear-gradient(white, white) padding-box, linear-gradient(to right, #ed143d, #ed143d) border-box;
+  cursor: pointer;
+}
+
+.custom-button-fill:hover::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #ed143d 0%, #ed143d 100%);
+}
+
+.custom-button-fill .button-fill-text {
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 21px;
+  color: #fff;
+}
+
+.custom-button-fill:hover .button-fill-text {
+  background: linear-gradient(90deg, #ed143d 0%, #ed143d 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.custom-button-fill .button-fill-icon {
+  color: #fff;
+}
+
+.custom-button-fill:hover .button-fill-icon {
+  color: #ed143d;
+}
+
+.header-table {
+  display: grid;
+  grid-template-columns: 90% 10%;
+
+}

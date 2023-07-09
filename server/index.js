@@ -2,9 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const app = express();
 const server = require("http").createServer(app);
-const mongoose = require("mongoose");
-const shortId = require("shortid");
-const jwt = require("jsonwebtoken");
+const path = require("path");
 const io = require("socket.io")(server, {
   cors: {
     origin: "*",
@@ -13,29 +11,59 @@ const io = require("socket.io")(server, {
 const mqtt = require("mqtt");
 const cors = require("cors");
 var bodyParser = require("body-parser");
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
 
-const topic_mqtt = process.env.TOPIC_MQTT;
-const host_mongodb = process.env.HOST_MONGODB;
-const key_token = process.env.KEY_TOKEN;
-const username_mqtt = process.env.USERNAME_MQTT;
-const password_mqtt = process.env.PASSWORD_MQTT;
+//token-id
+const crypto = require("crypto");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const shortId = require("shortid");
 
-const port_server = process.env.PORT_SERVER;
-const client = mqtt.connect(process.env.HOST_MQTT, {
-  username: username_mqtt,
-  password: password_mqtt,
-});
-
-app.use(cors());
-app.options("*", cors());
-
+//require db
+const mongoose = require("mongoose");
 const stations = require("./models/stationsModel");
 const listStations = require("./models/listStationsModel");
 const users = require("./models/userModel");
 
-app.use("/public", express.static("public"));
+//require service mail
+const { OAuth2Client } = require("google-auth-library");
+const nodemailer = require("nodemailer");
+// const sendgridTransport = require("nodemailer-sendgrid-transport");
+
+//app.use
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+app.use(cors());
+app.options("*", cors());
+app.use("/public", express.static(__dirname + "/public"));
+
+//Google mailer setup
+const GOOGLE_MAILER_CLIENT_ID = process.env.GOOGLE_MAILER_CLIENT_ID;
+const GOOGLE_MAILER_CLIENT_SECRET = process.env.GOOGLE_MAILER_CLIENT_SECRET;
+const GOOGLE_MAILER_REFRESH_TOKEN = process.env.GOOGLE_MAILER_REFRESH_TOKEN;
+const ADMIN_EMAIL_ADDRESS = process.env.ADMIN_EMAIL_ADDRESS;
+
+const myOAuth2Client = new OAuth2Client(
+  GOOGLE_MAILER_CLIENT_ID,
+  GOOGLE_MAILER_CLIENT_SECRET
+);
+myOAuth2Client.setCredentials({
+  refresh_token: GOOGLE_MAILER_REFRESH_TOKEN,
+});
+
+//key-token for hash password with jws
+const key_token = process.env.KEY_TOKEN;
+
+//mongodb - port server
+const port_server = process.env.PORT_SERVER;
+const host_mongodb = process.env.HOST_MONGODB;
+//mqtt broker
+const topic_mqtt = process.env.TOPIC_MQTT;
+const username_mqtt = process.env.USERNAME_MQTT;
+const password_mqtt = process.env.PASSWORD_MQTT;
+const client = mqtt.connect(process.env.HOST_MQTT, {
+  username: username_mqtt,
+  password: password_mqtt,
+});
 
 //Create server
 server.listen(port_server, async () => {
@@ -136,17 +164,98 @@ app.post("/login", async (req, res) => {
   var { username, password } = req.body;
   const user = await users.findOne({ username });
   if (!user) return res.status(400).send("Username or password is wrong");
-  //Check password
-  if (user.password == password) {
-    const token = jwt.sign({ _id: user._id }, key_token);
-    res.json({
-      token,
-      user: {
-        id: user._id,
-        email: user.username,
-      },
+  //ss
+  bcrypt.compare(password, user.password).then((doMatch) => {
+    if (doMatch) {
+      const token = jwt.sign({ _id: user._id }, key_token);
+      res.json({
+        token,
+        user: {
+          id: user._id,
+          email: user.username,
+        },
+      });
+    } else {
+      return res.status(400).json({ error: "Invalid Email or password" });
+    }
+  });
+});
+
+app.post("/auth/forgotpassword", async (req, res) => {
+  crypto.randomBytes(32, (err, buffer) => {
+    if (err) {
+      console.log(err);
+    }
+    const token = buffer.toString("hex");
+    users.findOne({ username: req.body.emailUser }).then((user) => {
+      if (!user) {
+        return res
+          .status(422)
+          .json({ error: "User dont exists with that email" });
+      }
+      user.resetToken = token;
+      user.expireToken = Date.now() + 3600000;
+      user.save().then(async (result) => {
+        const myAccessTokenObject = await myOAuth2Client.getAccessToken();
+        const myAccessToken = myAccessTokenObject?.token;
+
+        const transport = nodemailer.createTransport({
+          service: "gmail",
+          auth: {
+            type: "OAuth2",
+            user: ADMIN_EMAIL_ADDRESS,
+            clientId: GOOGLE_MAILER_CLIENT_ID,
+            clientSecret: GOOGLE_MAILER_CLIENT_SECRET,
+            refresh_token: GOOGLE_MAILER_REFRESH_TOKEN,
+            accessToken: myAccessToken,
+          },
+        });
+
+        const mailOptions = {
+          to: user.username, // Gửi đến ai?
+          subject: "Reset password - TBNET-WEB", // Tiêu đề email
+          html: `
+          <p>You requested for password reset</p>
+          <h3>Click in this <a href="http://localhost:8080/reset/${token}">link</a> to reset password</h3>
+          `,
+        };
+
+        await transport.sendMail(mailOptions);
+
+        res.json({ message: "check your email" });
+      });
     });
-  } else {
-    res.status(400).send("Email or password is wrong!");
-  }
+  });
+});
+
+app.get("/reset/:tokenreset", (req, res) => {
+  var link = path.join(__dirname);
+  console.log(link);
+  res.sendFile(__dirname + "/public/resetpassword.html");
+});
+
+app.post("/new-password", (req, res) => {
+  const newPassword = req.body.password;
+  const sentToken = req.body.token;
+  console.log(newPassword);
+  console.log(sentToken);
+  console.log(Date.now());
+  users
+    .findOne({ resetToken: sentToken, expireToken: { $gt: Date.now() } })
+    .then((user) => {
+      if (!user) {
+        return res.status(422).json({ error: "Try again session expired" });
+      }
+      bcrypt.hash(newPassword, 12).then((hashedpassword) => {
+        user.password = hashedpassword;
+        user.resetToken = undefined;
+        user.expireToken = undefined;
+        user.save().then((saveduser) => {
+          res.json({ message: "password updated success" });
+        });
+      });
+    })
+    .catch((err) => {
+      console.log(err);
+    });
 });
