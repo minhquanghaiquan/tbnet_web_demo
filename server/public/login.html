@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <base href="http://localhost:8080/public/" target="_parent" />
+    <base href="http://178.128.113.184:8081/public/" target="_parent" />
     <link rel="stylesheet" href="style/login.css" />
     <link rel="shortcut icon" href="img/logo-web.png" />
     <title>TB NET - Login</title>
@@ -91,7 +91,7 @@
     form1.addEventListener("submit", (event) => {
       event.preventDefault();
       axios
-        .post("http://localhost:8080/login", { username, password })
+        .post("http://178.128.113.184:8081/login", { username, password })
         .then(function (res) {
           localStorage.setItem("auth-token", res.data.token);
           window.location.href = "liststation.html";

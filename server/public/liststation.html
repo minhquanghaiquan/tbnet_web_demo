@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <base href="http://localhost:8080/public/" target="_parent" />
+    <base href="http://178.128.113.184:8081/public/" target="_parent" />
     <link rel="stylesheet" href="style/liststation.css" />
     <link rel="shortcut icon" href="img/logo-web.png" />
     <title>TB NET - List Station</title>
@@ -31,7 +31,7 @@
     getListStations = async () => {
       console.log("HTTP GET with Axios");
       axios
-        .get("http://localhost:8080/stations", {
+        .get("http://178.128.113.184:8081/stations", {
           headers: { "auth-token": localStorage.getItem("auth-token") },
         })
         .then((response) => {
