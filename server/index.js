@@ -151,6 +151,12 @@ app.get("/stations", tokenIsValid, async (req, res) => {
   return res.status(200).json(getListStations);
 });
 
+app.get("/", async (req, res) => {
+    var link = path.join(__dirname);
+    console.log(link);
+    res.sendFile(__dirname + "/public/index.html");
+  });
+
 app.get("/stations/:station_id", tokenIsValid, async (req, res) => {
   var station_id = req.params.station_id;
   var thisStation = await stations.findOne({ station_id: station_id });
@@ -216,7 +222,7 @@ app.post("/auth/forgotpassword", async (req, res) => {
           subject: "Reset password - TBNET-WEB", // Tiêu đề email
           html: `
           <p>You requested for password reset</p>
-          <h3>Click in this <a href="http://localhost:8080/reset/${token}">link</a> to reset password</h3>
+          <h3>Click in this <a href="http://178.128.113.184:8081/reset/${token}">link</a> to reset password</h3>
           `,
         };
 

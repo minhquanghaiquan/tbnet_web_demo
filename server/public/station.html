@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <base href="http://localhost:8080/public/" target="_parent" />
+    <base href="http://178.128.113.184:8081/public/" target="_parent" />
     <link rel="stylesheet" href="style/station.css" />
     <link rel="shortcut icon" href="img/logo-web.png" />
     <title>TB NET - Station</title>
@@ -58,7 +58,7 @@
       <p id="status" style="font-size: 30"></p>
     </div>
     <script>
-      let socket = io("http://localhost:8080");
+      let socket = io("http://178.128.113.184:8081");
       var station_id = localStorage.getItem("station_id");
       let el;
       let status_currentcontrol = 0;
@@ -75,7 +75,7 @@
       //Get data for the first load
       getData = async () => {
         axios
-          .get("http://localhost:8080/stations/" + station_id, {
+          .get("http://178.128.113.184:8081/stations/" + station_id, {
             headers: { "auth-token": localStorage.getItem("auth-token") },
           })
           .then((response) => {
