@@ -97,7 +97,7 @@
           window.location.href = "liststation.html";
         })
         .catch(function (error) {
-          alert(error.response.data);
+          alert(error.response.data.error);
         });
     });
   </script>
