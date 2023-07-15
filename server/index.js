@@ -20,6 +20,7 @@ const shortId = require("shortid");
 
 //require db
 const mongoose = require("mongoose");
+// const mongodb = require("mongodb");
 const stations = require("./models/stationsModel");
 const listStations = require("./models/listStationsModel");
 const users = require("./models/userModel");
@@ -27,7 +28,6 @@ const users = require("./models/userModel");
 //require service mail
 const { OAuth2Client } = require("google-auth-library");
 const nodemailer = require("nodemailer");
-// const sendgridTransport = require("nodemailer-sendgrid-transport");
 
 //app.use
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -87,16 +87,17 @@ client.on("connect", async () => {
 
 client.on("message", async (topic_mqtt, message) => {
   var data = message.toString();
-  data = JSON.parse(data);
-  console.log(data);
-  data.created = new Date().toTimeString();
-  data._id = shortId.generate();
-  await stations.findOneAndUpdate(
-    { station_id: data.station_id },
-    { $push: { station_values: data } }
-  );
-  topic_mqtt = topic_mqtt + data.station_id;
-  sendDataToClient(topic_mqtt, data);
+  if (data) {
+    data = JSON.parse(data);
+    data.created = new Date().toTimeString();
+    data._id = shortId.generate();
+    await stations.findOneAndUpdate(
+      { station_id: data.station_id },
+      { $push: { station_values: data } }
+    );
+    topic_mqtt = topic_mqtt + data.station_id;
+    sendDataToClient(topic_mqtt, data);
+  }
 });
 
 // Connect to client by socket io
@@ -130,32 +131,32 @@ setInterval(() => {
 tokenIsValid = async (req, res, next) => {
   try {
     const token = req.header("auth-token");
-    console.log(token);
+
     if (!token) return res.json(false);
 
     const verified = jwt.verify(token, key_token);
     if (!verified) return res.json(false);
 
-    const user = await users.findById(verified._id);
+    const user = await users.findOne({ username: verified.username });
+    console.log(user);
     if (!user) return res.json(false);
-
     return next();
   } catch (err) {
+    console.log(err);
     res.status(500).json({ error: err.message });
   }
 };
 
 //REST API
-app.get("/stations", tokenIsValid, async (req, res) => {
-  var getListStations = await listStations.find({});
-  return res.status(200).json(getListStations);
+app.get("/", async (req, res) => {
+  res.sendFile(__dirname + "/public/index.html");
 });
 
-app.get("/", async (req, res) => {
-    var link = path.join(__dirname);
-    console.log(link);
-    res.sendFile(__dirname + "/public/index.html");
-  });
+app.get("/stations", tokenIsValid, async (req, res) => {
+  var getListStations = await listStations.find({});
+  console.log(getListStations);
+  return res.status(200).json(getListStations);
+});
 
 app.get("/stations/:station_id", tokenIsValid, async (req, res) => {
   var station_id = req.params.station_id;
@@ -173,7 +174,7 @@ app.post("/login", async (req, res) => {
   //ss
   bcrypt.compare(password, user.password).then((doMatch) => {
     if (doMatch) {
-      const token = jwt.sign({ _id: user._id }, key_token);
+      const token = jwt.sign({ username: user.username }, key_token);
       res.json({
         token,
         user: {
@@ -187,21 +188,21 @@ app.post("/login", async (req, res) => {
   });
 });
 
-app.post("/auth/forgotpassword", async (req, res) => {
+app.post("/auth/forgotpassword", (req, res) => {
   crypto.randomBytes(32, (err, buffer) => {
     if (err) {
       console.log(err);
     }
     const token = buffer.toString("hex");
-    users.findOne({ username: req.body.emailUser }).then((user) => {
-      if (!user) {
-        return res
-          .status(422)
-          .json({ error: "User dont exists with that email" });
-      }
-      user.resetToken = token;
-      user.expireToken = Date.now() + 3600000;
-      user.save().then(async (result) => {
+    console.log(req.body.emailUser);
+    console.log(token);
+
+    users
+      .findOneAndUpdate(
+        { username: req.body.emailUser },
+        { $set: { resetToken: token, expireToken: Date.now() + 3600000 } }
+      )
+      .then(async (user) => {
         const myAccessTokenObject = await myOAuth2Client.getAccessToken();
         const myAccessToken = myAccessTokenObject?.token;
 
@@ -222,15 +223,56 @@ app.post("/auth/forgotpassword", async (req, res) => {
           subject: "Reset password - TBNET-WEB", // Tiêu đề email
           html: `
           <p>You requested for password reset</p>
-          <h3>Click in this <a href="http://178.128.113.184:8081/reset/${token}">link</a> to reset password</h3>
+          <h3>Click in this <a href="http://localhost:8080/reset/${token}">link</a> to reset password</h3>
           `,
         };
-
         await transport.sendMail(mailOptions);
-
         res.json({ message: "check your email" });
+      })
+      .catch((err) => {
+        console.log(err);
       });
-    });
+
+    // users.findOne({ username: req.body.emailUser }).then((user) => {
+    //   console.log(user);
+    //   if (!user) {
+    //     return res
+    //       .status(422)
+    //       .json({ error: "User dont exists with that email" });
+    //   }
+    //   user.resetToken = token;
+    //   user.expireToken = Date.now() + 3600000;
+    //   console.log(user);
+    //   user.save().then(async (result) => {
+    //     const myAccessTokenObject = await myOAuth2Client.getAccessToken();
+    //     const myAccessToken = myAccessTokenObject?.token;
+
+    //     const transport = nodemailer.createTransport({
+    //       service: "gmail",
+    //       auth: {
+    //         type: "OAuth2",
+    //         user: ADMIN_EMAIL_ADDRESS,
+    //         clientId: GOOGLE_MAILER_CLIENT_ID,
+    //         clientSecret: GOOGLE_MAILER_CLIENT_SECRET,
+    //         refresh_token: GOOGLE_MAILER_REFRESH_TOKEN,
+    //         accessToken: myAccessToken,
+    //       },
+    //     });
+
+    //     const mailOptions = {
+    //       to: user.username, // Gửi đến ai?
+    //       subject: "Reset password - TBNET-WEB", // Tiêu đề email
+    //       html: `
+    //       <p>You requested for password reset</p>
+    //       <h3>Click in this <a href="http://localhost:8080/reset/${token}">link</a> to reset password</h3>
+    //       `,
+    //     };
+
+    //     await transport.sendMail(mailOptions);
+
+    //     res.json({ message: "check your email" });
+    //   });
+    // });
   });
 });
 
@@ -240,26 +282,25 @@ app.get("/reset/:tokenreset", (req, res) => {
   res.sendFile(__dirname + "/public/resetpassword.html");
 });
 
-app.post("/new-password", (req, res) => {
+app.post("/new-password", async (req, res) => {
   const newPassword = req.body.password;
   const sentToken = req.body.token;
-  console.log(newPassword);
-  console.log(sentToken);
-  console.log(Date.now());
+  const hashedpassword = await bcrypt.hash(newPassword, 12);
   users
-    .findOne({ resetToken: sentToken, expireToken: { $gt: Date.now() } })
-    .then((user) => {
-      if (!user) {
-        return res.status(422).json({ error: "Try again session expired" });
-      }
-      bcrypt.hash(newPassword, 12).then((hashedpassword) => {
-        user.password = hashedpassword;
-        user.resetToken = undefined;
-        user.expireToken = undefined;
-        user.save().then((saveduser) => {
-          res.json({ message: "password updated success" });
-        });
-      });
+    .findOneAndUpdate(
+      { resetToken: sentToken, expireToken: { $gt: Date.now() } },
+      {
+        $set: {
+          password: hashedpassword,
+          expireToken: null,
+          resetToken: null,
+        },
+      },
+      { new: true }
+    )
+    .then((saveduser) => {
+      console.log(saveduser);
+      res.json({ message: "password updated success" });
     })
     .catch((err) => {
       console.log(err);
