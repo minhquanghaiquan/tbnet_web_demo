@@ -223,7 +223,7 @@ app.post("/auth/forgotpassword", (req, res) => {
           subject: "Reset password - TBNET-WEB", // Tiêu đề email
           html: `
           <p>You requested for password reset</p>
-          <h3>Click in this <a href="http://localhost:8080/reset/${token}">link</a> to reset password</h3>
+          <h3>Click in this <a href="http://178.128.113.184:8081/reset/${token}">link</a> to reset password</h3>
           `,
         };
         await transport.sendMail(mailOptions);
