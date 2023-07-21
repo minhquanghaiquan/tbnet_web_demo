@@ -287,6 +287,7 @@ app.post("/auth/forgotpassword", (req, res) => {
 
     let SQL_select = "SELECT * FROM users WHERE login_user=$1;";
     const user = await pool.query(SQL_select, [req.body.emailUser]);
+    c;
 
     let SQL = `UPDATE "users" 
                 SET "reset_token" = $1 ,"expire_token" = $2
@@ -313,7 +314,7 @@ app.post("/auth/forgotpassword", (req, res) => {
       subject: "Reset password - TBNET-WEB", // Tiêu đề email
       html: `
           <p>You requested for password reset</p>
-          <h3>Click in this <a href="http://localhost:8080/reset/${token}">link</a> to reset password</h3>
+          <h3>Click in this <a href="http://178.128.113.184:8081/reset/${token}">link</a> to reset password</h3>
           `,
     };
     await transport.sendMail(mailOptions);
