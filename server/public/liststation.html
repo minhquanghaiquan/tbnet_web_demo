@@ -20,9 +20,9 @@
     </div>
     <table id="customers">
       <tr>
-        <th>Trạm</th>
-        <th>Mã trạm</th>
-        <th>Địa chỉ</th>
+        <th>Model</th>
+        <th>Device_id</th>
+        <th>Status</th>
       </tr>
     </table>
   </body>
@@ -60,16 +60,16 @@
         let td1 = document.createElement("TD");
         let a = document.createElement("A");
         a.href = "./station.html";
-        a.textContent = station.station_name;
+        a.textContent = station.model;
         a.addEventListener("click", function () {
-          localStorage.setItem("station_id", station.station_id);
-          localStorage.setItem("station_name", station.station_name);
+          localStorage.setItem("device_id", station.device_id);
+          localStorage.setItem("status", station.status);
         });
         td1.appendChild(a);
         let td2 = document.createElement("TD");
         let td3 = document.createElement("TD");
-        td2.textContent = station.station_id;
-        td3.textContent = station.station_address;
+        td2.textContent = station.device_id;
+        td3.textContent = station.status;
         tr.appendChild(td1);
         tr.appendChild(td2);
         tr.appendChild(td3);

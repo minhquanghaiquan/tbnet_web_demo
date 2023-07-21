@@ -59,7 +59,7 @@
     </div>
     <script>
       let socket = io("http://178.128.113.184:8081");
-      var station_id = localStorage.getItem("station_id");
+      var device_id = localStorage.getItem("device_id");
       let el;
       let status_currentcontrol = 0;
 
@@ -68,14 +68,14 @@
         let el = document.getElementById("server_time");
         el.innerHTML = "Server time " + timeString;
       });
-      socket.on("data_station" + station_id, (newValue) => {
-        handleData(newValue);
+      socket.on(device_id + "/control", (newValue) => {
+        handleData(newValue.payload);
       });
 
       //Get data for the first load
       getData = async () => {
         axios
-          .get("http://178.128.113.184:8081/stations/" + station_id, {
+          .get("http://178.128.113.184:8081/stations/" + device_id, {
             headers: { "auth-token": localStorage.getItem("auth-token") },
           })
           .then((response) => {
@@ -83,9 +83,10 @@
               window.location.href = "login.html";
             }
             let lastValue = response.data.lastValue;
+            console.log(lastValue);
             let status_currentcontrol = response.data.status_currentcontrol;
-            let station_name = document.getElementById("station_name");
-            station_name.innerHTML = localStorage.getItem("station_name");
+            let device_id = document.getElementById("device_id");
+            device_id.innerHTML = localStorage.getItem("device_id");
             handleStatusControl(status_currentcontrol);
             handleData(lastValue);
           })
@@ -102,15 +103,15 @@
       //Handle Data
       handleData = (values) => {
         let el001 = document.getElementById("value001");
-        el001.innerHTML = values.value001;
+        el001.innerHTML = values.s0;
         let el002 = document.getElementById("value002");
-        el002.innerHTML = values.value002;
-        let el003 = document.getElementById("value003");
-        el003.innerHTML = values.value003;
-        let el004 = document.getElementById("value004");
-        el004.innerHTML = values.value004;
-        let el005 = document.getElementById("value005");
-        el005.innerHTML = values.value005;
+        el002.innerHTML = values.s1;
+        // let el003 = document.getElementById("value003");
+        // el003.innerHTML = values.value003;
+        // let el004 = document.getElementById("value004");
+        // el004.innerHTML = values.value004;
+        // let el005 = document.getElementById("value005");
+        // el005.innerHTML = values.value005;
       };
 
       //Hadle status control
@@ -139,7 +140,7 @@
           status.innerText = "ON";
         }
         var data = {
-          station_id,
+          device_id,
           status_currentcontrol,
         };
         console.log(data);
