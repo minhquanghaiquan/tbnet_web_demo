@@ -82,43 +82,9 @@ const client = mqtt.connect(process.env.HOST_MQTT, {
 //Create server
 server.listen(port_server, async () => {
   console.log(`Example server listening on port ${port_server}`);
-  // await mongoose.connect(host_mongodb);
-  const users = `
-    CREATE TABLE IF NOT EXISTS "public"."users" (
-      "id" BIGSERIAL ,
-        "login_user" VARCHAR(128) NOT NULL, 
-        "login_pwd" VARCHAR(1024) UNIQUE NOT NULL, 
-        "reset_token" VARCHAR(1024) UNIQUE, 
-        "expire_token" BIGINT UNIQUE, 
-        "created_at" TIMESTAMP,
-        PRIMARY KEY ("id")
-    );`;
-
-  const device = `
-    CREATE TABLE IF NOT EXISTS "public"."device" (
-        "id" BIGSERIAL,
-        "device_id" VARCHAR(50) NOT NULL, 
-        "model" VARCHAR(128) NOT NULL, 
-        "status" INTEGER NOT NULL, 
-        "version_fw" VARCHAR(1024) UNIQUE, 
-        "version_hw" VARCHAR(1024) UNIQUE, 
-        "expired_date" TIMESTAMP,
-        "created_at" TIMESTAMP,
-        PRIMARY KEY ("id")
-    );`;
-  const device_data = `
-    CREATE TABLE IF NOT EXISTS "public"."device_data" (
-      "id" BIGSERIAL,
-        "device_id" VARCHAR(50) NOT NULL, 
-        "s0" INTEGER NOT NULL,
-        "s1" INTEGER NOT NULL,
-        "created_at" TIMESTAMP,
-        PRIMARY KEY ("id")
-    );`;
-
-  await pool.query(users);
-  await pool.query(device);
-  await pool.query(device_data);
+  await pool.query(process.env.CREATE_USERS);
+  await pool.query(process.env.CREATE_DEVICE);
+  await pool.query(process.env.CREATE_DEVICE_DATA);
 
   let SQL1 = "SELECT * FROM users WHERE login_user=$1;";
   const check_user = await pool.query(SQL1, ["minhquangbvmi@gmail.com"]);
@@ -130,7 +96,7 @@ server.listen(port_server, async () => {
   let SQL3 = "SELECT * FROM device WHERE device_id=$1;";
   const check_device1 = await pool.query(SQL3, ["A132323234554"]);
   const check_device2 = await pool.query(SQL3, ["A132323234555"]);
-  console.log(check_device2.rows);
+
   if (check_device1.rows.length == 0) {
     var SQL4 =
       "INSERT INTO device (device_id , model, status ) VALUES  ($1 , $2, $3 );";
@@ -143,14 +109,6 @@ server.listen(port_server, async () => {
   }
 });
 
-//Connect to MongoDB
-// mongoose.connection.on("connected", async () => {
-//   console.log("MongoDB connected");
-// });
-// mongoose.connection.on("error", async () => {
-//   console.log("MongoDB connect fail");
-// });
-
 //Connect to MQTT broker
 client.on("connect", async () => {
   console.log("MQTT connected");
@@ -161,17 +119,25 @@ client.on("message", async (topic_mqtt, message) => {
   var data = message.toString();
   if (data) {
     data = JSON.parse(data);
-    // data.created = new Date().toTimeString();
-    // data._id = shortId.generate();
-    console.log(new Date());
-    let SQL =
-      "INSERT INTO device_data (device_id , s0 , s1, created_at ) VALUES ( $1 , $2 , $3, $4 );";
-    await pool.query(SQL, [
-      data.header.serial_number,
-      data.payload.s0,
-      data.payload.s1,
-      new Date(),
-    ]);
+
+    const ColumsDeviceData = () => {
+      let columnsInsert = ["id", "device_id"];
+      for (var i = 0; i < 121; i++) {
+        columnsInsert.push("s" + i);
+      }
+      columnsInsert.push("created_at");
+      return columnsInsert;
+    };
+
+    let device_data = sql.define({
+      name: "device_data",
+      columns: ColumsDeviceData(),
+    });
+
+    let data_insert = data.payload;
+    data_insert.device_id = data.header.serial_number;
+    let query = device_data.insert([data_insert]).returning("*").toQuery();
+    await pool.query(query);
 
     var topic_mqtt_device = data.header.serial_number + "/control";
     sendDataToClient(topic_mqtt_device, data);
@@ -234,9 +200,6 @@ app.get("/stations", tokenIsValid, async (req, res) => {
 
 app.get("/stations/:device_id", tokenIsValid, async (req, res) => {
   var device_id = req.params.device_id;
-  // let SQL = "SELECT * FROM device_data WHERE device_id=$1;";
-  // const device_data = await pool.query(SQL, [device_id]);
-  // var lastValue = device_data.rows[device_data.rows.length - 1];
 
   let SQL1 =
     "SELECT * FROM public.device_data WHERE device_id=$1 ORDER BY created_at DESC;";
@@ -344,5 +307,18 @@ app.post("/new-password", async (req, res) => {
 
   if (user.rows.length !== 0) {
     res.json({ message: "password updated success" });
+  }
+});
+
+app.post("/getserial", async (req, res) => {
+  if (req.body.model) {
+    console.log(req.body);
+    var { model } = req.body;
+    var device_id = "A" + Date.now();
+    var SQL = "INSERT INTO device (device_id , model ) VALUES ($1 , $2);";
+    await pool.query(SQL, [device_id, model]);
+    res.json({ device_id, model });
+  } else {
+    res.json("Send your name of model");
   }
 });
