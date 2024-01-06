@@ -1,4 +1,4 @@
-#customers {
+/* #customers {
     font-family: Arial, Helvetica, sans-serif;
     border-collapse: collapse;
     width: 100%;
@@ -36,7 +36,7 @@
   }
 
    /* button */
- .custom-button-fill {
+ /* .custom-button-fill {
   align-items: center;
   justify-content: center;
   padding: 15px 25px;
@@ -89,4 +89,128 @@
   display: grid;
   grid-template-columns: 90% 10%;
 
+} */ 
+
+body {
+  font-family: 'Arial', sans-serif;
+  background-color: #f5f5f5;
+  color: #333;
+  margin: 0;
+  padding: 0;
+}
+
+.header-table {
+  background-color: #009879;
+  padding: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.header-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 80%;
+  margin: 0 auto;
+}
+
+.button-logout {
+  margin-left: auto;
+}
+
+.custom-button-fill {
+  background-color: #ed143d;
+  color: #fff;
+  padding: 15px 30px;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+}
+
+.custom-button-fill:hover {
+  background-color: #c5113e;
+}
+
+.body-table {
+  max-width: 80%;
+  margin: 20px auto;
+  padding: 20px;
+}
+
+.div-search {
+  margin-bottom: 20px;
+}
+
+#search-input {
+  width: 100%;
+  padding: 15px;
+  box-sizing: border-box;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.div-table {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  background-color: #fff;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+th, td {
+  padding: 20px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+tr:hover {
+  background-color: #f5f5f5;
+}
+
+/* Đổi màu chữ Danh sách trạm thành màu trắng */
+.header-table h1 {
+  color: #fff;
+}
+
+/* Tạo hiệu ứng cho các thẻ link */
+a {
+  text-decoration: none;
+  color: #009879;
+  transition: color 0.3s ease;
+}
+
+a:hover {
+  color: #007a67;
+}
+
+@media screen and (max-width: 600px) {
+  .header-container {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .button-logout {
+    margin: 20px 0;
+  }
+
+  .custom-button-fill {
+    width: 100%;
+  }
+
+  table {
+    overflow-x: auto;
+  }
+}
+
+/* Thay đổi kích thước thẻ input ở desktop */
+@media screen and (min-width: 601px) {
+  #search-input {
+    width: 300px; /* Đặt kích thước mong muốn cho thẻ input ở desktop */
+  }
 }

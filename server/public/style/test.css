@@ -1,0 +1,261 @@
+h1{
+  font-size: 30px;
+  color: #ed143d;
+  text-transform: uppercase;
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 15px;
+  font-family: 'Roboto', sans-serif;
+}
+
+/* Toggle text */
+p {
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: bold;
+  margin: 0;
+}
+
+/* button */
+.custom-button-fill {
+  align-items: center;
+  justify-content: center;
+  padding: 15px 25px;
+  border-radius: 10px;
+  gap: 6px;
+  background: #ed143d;
+  border: 2px solid transparent;
+}
+
+.custom-button-fill:hover {
+  position: relative;
+  background: linear-gradient(white, white) padding-box, linear-gradient(to right, #ed143d, #ed143d) border-box;
+  cursor: pointer;
+}
+
+.custom-button-fill:hover::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #ed143d 0%, #ed143d 100%);
+}
+
+.custom-button-fill .button-fill-text {
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 21px;
+  color: #fff;
+}
+
+.custom-button-fill:hover .button-fill-text {
+  background: linear-gradient(90deg, #ed143d 0%, #ed143d 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.custom-button-fill .button-fill-icon {
+  color: #fff;
+}
+
+.custom-button-fill:hover .button-fill-icon {
+  color: #ed143d;
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+}
+
+.switch input { 
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+input:checked + .slider {
+  background-color: #2196F3;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(26px);
+  -ms-transform: translateX(26px);
+  transform: translateX(26px);
+}
+
+/* Rounded sliders */
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
+
+
+
+/*NEWWWWWWWWWWWW*/
+
+/* Reset some default styles for better consistency */
+body, h1, h2, h3, p, ul, li {
+  margin: 0;
+  padding: 0;
+}
+
+/* Apply a box-sizing border-box to all elements for better layout control */
+* {
+  box-sizing: border-box;
+}
+
+/* Style the table container */
+.table-data {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+/* Style the table */
+.table-content {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+}
+
+/* Style table header */
+.table-content th {
+  background-color: #f2f2f2;
+  padding: 10px;
+  text-align: center;
+  font-weight: bold;
+}
+
+/* Style table cells */
+.table-content td,
+.table-content th {
+  border: 1px solid #dddddd;
+  padding: 8px;
+  text-align: left;
+}
+
+/* Highlighted category style */
+.highlighted-category {
+  background-color: #e6f7ff;
+}
+
+.table-content .table-title {
+  color: #009879; /* Chọn màu bạn muốn */
+  font-weight: bold;
+  font-size: 1.2em; /* Điều chỉnh kích thước chữ */
+}
+
+
+.station_id {
+  text-align: center !important;
+}
+
+/* Switch style */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 20px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: .4s;
+  border-radius: 20px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 16px;
+  width: 16px;
+  left: 2px;
+  bottom: 2px;
+  background-color: white;
+  transition: .4s;
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background-color: #2196F3;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked + .slider:before {
+  transform: translateX(20px);
+}
+
+/* Value button style */
+.value-button {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  background-color: #f2f2f2;
+  text-align: center;
+  line-height: 20px;
+  cursor: pointer;
+  border: 1px solid #ccc;
+}
+
+/* Responsive styles */
+@media (max-width: 600px) {
+  .table-content {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 400px) {
+  .table-content {
+    font-size: 10px;
+  }
+}

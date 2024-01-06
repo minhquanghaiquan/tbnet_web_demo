@@ -41,6 +41,7 @@ h1{
 p {
   font-family: Arial, Helvetica, sans-serif;
   font-weight: bold;
+  margin: 0;
 }
 
 /* Checkbox checked effect */
@@ -185,37 +186,177 @@ p {
   width: 100%;
 }
 
-.item {
+
+.switch {
   position: relative;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+}
+
+.switch input { 
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+input:checked + .slider {
+  background-color: #2196F3;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(26px);
+  -ms-transform: translateX(26px);
+  transform: translateX(26px);
+}
+
+/* Rounded sliders */
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
+
+/* *new */
+
+* {
+  font-family: sans-serif; /* Change your font family */
+}
+
+.table {
+  display: inline-flex;
+  flex-wrap: wrap;
+  width: 100%;
+  /* grid-template-columns: 50% 50%; */
+}
+
+.content-table {
+  border-collapse: collapse;
+  margin: 25px 50px;
+  font-size: 0.9em;
+  min-width: 400px;
+  border-radius: 5px 5px 0 0;
   overflow: hidden;
-  background: #FFFFFF;
-  border: 1px solid #CDCDCD;
-  border-radius: 3px;
-  text-decoration: none;
-  transition: 0.5s;
-  z-index: 0;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
 }
 
-.item:hover {
-  border: 1px solid #fff0;
-  box-shadow: 3px 3px 20px rgba(50, 50, 50, 0.25);
-  border-radius: 3px;
+.content-table thead tr {
+  background-color: #009879;
+  color: #ffffff;
+  text-align: left;
+  font-weight: bold;
 }
 
-.item .title {
-  font-style: normal;
-  font-weight: 700;
-  font-size: 1rem;
-  line-height: 28px;
-  /* Основной текст */
-  color: #2F3035;
-  padding-left: 5px;
-/* 	padding-top: 20px */
+.content-table th,
+.content-table td {
+  padding: 12px 15px;
 }
 
-.item:hover>.title {
-  color: #1C62CD;
+.content-table tbody tr {
+  border-bottom: 1px solid #dddddd;
+}
+
+.content-table tbody tr:nth-of-type(even) {
+  background-color: #f3f3f3;
+}
+
+.content-table tbody tr:last-of-type {
+  border-bottom: 2px solid #009879;
+}
+
+.content-table tbody tr.active-row {
+  font-weight: bold;
+  color: #009879;
+}
+
+
+/* button inc disc */
+form {
+  width: 300px;
+  margin: 0 auto;
+  text-align: center;
+  padding-top: 50px;
+}
+
+.value-button {
+  display: inline-block;
+  border: 1px solid #ddd;
+  margin: 0px;
+  width: 40px;
+  height: 20px;
+  text-align: center;
+  vertical-align: middle;
+  padding: 11px 0;
+  background: #eee;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.value-button:hover {
+  cursor: pointer;
+}
+
+form #decrease {
+  margin-right: -4px;
+  border-radius: 8px 0 0 8px;
+}
+
+form #increase {
+  margin-left: -4px;
+  border-radius: 0 8px 8px 0;
+}
+
+form #input-wrap {
+  margin: 0px;
+  padding: 0px;
+}
+
+input#number {
+  text-align: center;
+  border: none;
+  border-top: 1px solid #ddd;
+  border-bottom: 1px solid #ddd;
+  margin: 0px;
+  width: 40px;
+  height: 40px;
+}
+
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
 }

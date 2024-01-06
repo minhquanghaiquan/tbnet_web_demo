@@ -11,20 +11,28 @@
   </head>
   <body>
     <div class="header-table">
-      <h1>Danh sách trạm</h1>
-      <div class="button-logout">
-        <button class="custom-button-fill" id="logoutButton">
-          <span class="button-fill-text">Logout</span>
-        </button>
+      <div class="header-container">
+        <h1>Danh sách trạm</h1>
+        <div class="button-logout">
+          <button class="custom-button-fill" id="logoutButton">
+            <span class="button-fill-text">Logout</span>
+          </button>
+        </div>
       </div>
     </div>
-    <table id="customers">
-      <tr>
-        <th>Model</th>
-        <th>Device_id</th>
-        <th>Status</th>
-      </tr>
-    </table>
+
+    <div class="body-table">
+      <div class="div-search"><input type="text" id="search-input" /></div>
+      <div class="div-table">
+        <table id="customers">
+          <tr class="header">
+            <th>Mã trạm</th>
+            <th>Khu vực</th>
+            <th>Cảnh báo</th>
+          </tr>
+        </table>
+      </div>
+    </div>
   </body>
   <script>
     //Get list stations from database - collection "listStations"
@@ -52,30 +60,109 @@
     getListStations();
 
     //Handle Data
+    // handleData = async (listStations) => {
+    //   listStations.forEach((station) => {
+    //     let tableElement = document.getElementById("customers");
+    //     let tr = document.createElement("TR");
+    //     let td1 = document.createElement("TD");
+    //     let a = document.createElement("A");
+    //     a.href = "./station.html";
+    //     a.textContent = station.device_id;
+    //     a.addEventListener("click", function () {
+    //       localStorage.setItem("device_id", station.device_id);
+    //       localStorage.setItem("status", station.status);
+    //     });
+    //     td1.appendChild(a);
+    //     let td2 = document.createElement("TD");
+    //     let td3 = document.createElement("TD");
+    //     td2.textContent = station.address;
+    //     td3.textContent = station.status;
+    //     tr.appendChild(td1);
+    //     tr.appendChild(td2);
+    //     tr.appendChild(td3);
+    //     tableElement.appendChild(tr);
+    //   });
+    // };
     handleData = async (listStations) => {
-      listStations.forEach((station) => {
-        let tableElement = document.getElementById("customers");
-        console.log(station);
-        let tr = document.createElement("TR");
-        let td1 = document.createElement("TD");
-        let a = document.createElement("A");
+      const tableElement = document.getElementById("customers");
+
+      // Xóa danh sách cũ
+      while (tableElement.firstChild) {
+        tableElement.removeChild(tableElement.firstChild);
+      }
+
+      // Tạo hàng tiêu đề
+      const tr = document.createElement("tr");
+      tr.classList.add("header");
+
+      const td1 = document.createElement("th");
+      td1.textContent = "Mã trạm";
+      tr.appendChild(td1);
+
+      const td2 = document.createElement("th");
+      td2.textContent = "Khu vực";
+      tr.appendChild(td2);
+
+      const td3 = document.createElement("th");
+      td3.textContent = "Cảnh báo";
+      tr.appendChild(td3);
+
+      tableElement.appendChild(tr);
+
+      for (const station of listStations) {
+        const tr = document.createElement("tr");
+
+        const td1 = document.createElement("td");
+        const a = document.createElement("a");
         a.href = "./station.html";
-        a.textContent = station.model;
-        a.addEventListener("click", function () {
+        a.textContent = station.device_id;
+        a.addEventListener("click", () => {
           localStorage.setItem("device_id", station.device_id);
           localStorage.setItem("status", station.status);
         });
         td1.appendChild(a);
-        let td2 = document.createElement("TD");
-        let td3 = document.createElement("TD");
-        td2.textContent = station.device_id;
+
+        const td2 = document.createElement("td");
+        td2.textContent = station.address;
+
+        const td3 = document.createElement("td");
         td3.textContent = station.status;
+
         tr.appendChild(td1);
         tr.appendChild(td2);
         tr.appendChild(td3);
+
         tableElement.appendChild(tr);
-      });
+      }
     };
+
+    //search
+    const searchInput = document.getElementById("search-input");
+    searchInput.addEventListener("keyup", function () {
+      const searchText = searchInput.value.toUpperCase();
+      console.log(searchText);
+      axios
+        .get("http://178.128.113.184:8081/stations", {
+          headers: { "auth-token": localStorage.getItem("auth-token") },
+        })
+        .then((response) => {
+          if (response.data === false) {
+            window.location.href = "login.html";
+          }
+          let listStations = response.data;
+          const filteredStations = listStations.filter((station) => {
+            return station.device_id.toUpperCase().includes(searchText);
+          });
+          handleData(filteredStations);
+        })
+        .catch((error) => {
+          if (error.response) {
+            console.log(error.reponse.status);
+          } else {
+            console.log(error.message);
+          }
+        });
+    });
 
     //logout
     var logoutButton = document.getElementById("logoutButton");
