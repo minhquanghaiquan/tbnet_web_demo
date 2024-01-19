@@ -9,413 +9,445 @@
     <title>TB NET - Station</title>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
-    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.5/xlsx.full.min.js"></script>
-    <script src="https://unpkg.com/tableexport@5.0.3/dist/js/tableexport.min.js"></script> -->
     <script src="https://cdn.jsdelivr.net/gh/linways/table-to-excel@v1.0.4/dist/tableToExcel.js"></script>
   </head>
   <body>
-    <div class="header-table">
-      <h1 id="device_id"></h1>
-      <div class="button-logout">
-        <button class="custom-button-fill" id="logoutButton">
-          <span class="button-fill-text">Logout</span>
-        </button>
+    <nav id="desktop-nav">
+      <div class="logo">TB-NET</div>
+      <div>
+        <ul class="nav-links">
+          <li><a href="#about">About</a></li>
+          <li><a href="#experience">Experience</a></li>
+          <li><a href="#projects">Projects</a></li>
+          <li><a href="#contact">Back</a></li>
+        </ul>
       </div>
-    </div>
-    <div class="header-button-connect">
-      <p id="server_time"></p>
-    </div>
-    <div class="download"><button id="exportBtn">Tải xuống</button></div>
+    </nav>
+    <nav id="hamburger-nav">
+      <div class="logo">TB-NET</div>
+      <div class="hamburger-menu">
+        <div class="hamburger-icon" onclick="toggleMenu()">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+        <div class="menu-links">
+          <li><a href="#about" onclick="toggleMenu()">About</a></li>
+          <li><a href="#experience" onclick="toggleMenu()">Experience</a></li>
+          <li><a href="#projects" onclick="toggleMenu()">Projects</a></li>
+          <li><a href="#contact" onclick="toggleMenu()">Contact</a></li>
+        </div>
+      </div>
+    </nav>
+    <section id="profile">
+      <div class="logo" id="device_id"></div>
+      <div class="header-button-connect">
+        <p id="server_time"></p>
+      </div>
+      <div class="btn-container">
+        <button id="exportBtn" class="btn btn-color-2">Download</button>
+        <button id="updateButton" class="btn btn-color-2">Update</button>
+      </div>
+      <div class="table-data">
+        <table border="1" class="table-content">
+          <tbody>
+            <tr>
+              <td rowspan="6" class="highlighted-category table-title-1">
+                Điện<br /><br />AC
+              </td>
+              <td class="ac"></td>
+              <td class="ac table-title-2">Pha A</td>
+              <td class="ac table-title-2">Pha B</td>
+              <td class="ac table-title-2">Pha C</td>
+              <td class="ac"></td>
+              <td class="ac"></td>
+              <td class="ac"></td>
+              <td class="ac"></td>
+              <td colspan="2" class="table-title-2 ac">
+                Trạng thái nguồn điện
+              </td>
+            </tr>
+            <tr>
+              <td class="ac table-title-2">Điện Áp<br />(V)</td>
+              <td id="s6" class="ac">Cột 2</td>
+              <td id="s7" class="ac">Cột 3</td>
+              <td id="s8" class="ac">Cột 4</td>
+              <td class="ac"></td>
+              <td class="ac"></td>
+              <td class="ac"></td>
+              <td class="ac"></td>
+              <td class="ac">Điện lưới</td>
+              <td id="s56" class="ac none">
+                <label class="switch">
+                  <input
+                    type="checkbox"
+                    id="input_s56"
+                    onclick="changeStatus(this);"
+                  />
+                  <span class="slider round"></span>
+                </label>
+              </td>
+            </tr>
+            <tr>
+              <td class="ac table-title-2">Dòng điện (A)</td>
+              <td id="s24" class="ac">Cột 2</td>
+              <td id="s25" class="ac">Cột 3</td>
+              <td id="s26" class="ac">Cột 4</td>
+              <td class="ac"></td>
+              <td class="ac"></td>
+              <td class="ac"></td>
+              <td class="ac"></td>
+              <td class="ac">Điện máy phát</td>
+              <td id="s57" class="ac none">
+                <label class="switch">
+                  <input
+                    type="checkbox"
+                    id="input_s57"
+                    onclick="changeStatus(this);"
+                  />
+                  <span class="slider round"></span>
+                </label>
+              </td>
+            </tr>
+            <tr>
+              <td class="ac table-title-2">Hệ số công suất</td>
+              <td id="s53" class="ac">Cột 2</td>
+              <td id="s54" class="ac">Cột 3</td>
+              <td id="s55" class="ac">Cột 4</td>
+              <td class="ac"></td>
+              <td class="ac"></td>
+              <td class="ac"></td>
+              <td class="ac"></td>
+              <td class="ac">Nguồn điện sử dụng</td>
+              <td id="s58" class="ac"></td>
+            </tr>
+            <tr>
+              <td class="ac table-title-2">Tần số<br />(Hz)</td>
+              <td id="s15" class="ac">Cột 2</td>
+              <td id="s16" class="ac">Cột 3</td>
+              <td id="s17" class="ac">Cột 4</td>
+              <td class="ac"></td>
+              <td class="ac"></td>
+              <td class="ac"></td>
+              <td class="ac"></td>
+              <td class="ac"></td>
+              <td class="ac"></td>
+            </tr>
+            <tr>
+              <td class="ac table-title-2">Công suất<br />(W)</td>
+              <td id="s35" class="ac">Cột 2</td>
+              <td id="s36" class="ac">Cột 3</td>
+              <td id="s37" class="ac">Cột 4</td>
+              <td class="ac"></td>
+              <td class="ac"></td>
+              <td class="ac"></td>
+              <td class="ac"></td>
+              <td class="ac"></td>
+              <td class="ac"></td>
+            </tr>
 
-    <div class="table-data">
-      <table border="1" class="table-content">
-        <thead>
-          <tr>
-            <th colspan="11" class="table-title station_id">HTP001</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td rowspan="6" class="highlighted-category table-title">
-              Điện AC
-            </td>
-            <td class="table-title">Giá trị</td>
-            <td class="table-title">Pha A</td>
-            <td class="table-title">Pha B</td>
-            <td class="table-title">Pha C</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td colspan="2" class="table-title">Trạng thái nguồn điện</td>
-          </tr>
-          <tr>
-            <td class="table-title">Điện Áp</td>
-            <td id="s6">Cột 2</td>
-            <td id="s7">Cột 3</td>
-            <td id="s8">Cột 4</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td class="table-title">Điện lưới</td>
-            <td id="s56">
-              <label class="switch">
-                <input
-                  type="checkbox"
-                  id="input_s56"
-                  onclick="changeStatus(this);"
-                />
-                <span class="slider round"></span>
-              </label>
-            </td>
-          </tr>
-          <tr>
-            <td class="table-title">Dòng điện</td>
-            <td id="s24">Cột 2</td>
-            <td id="s25">Cột 3</td>
-            <td id="s26">Cột 4</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td class="table-title">Điện máy phát</td>
-            <td id="s57">
-              <label class="switch">
-                <input
-                  type="checkbox"
-                  id="input_s57"
-                  onclick="changeStatus(this);"
-                />
-                <span class="slider round"></span>
-              </label>
-            </td>
-          </tr>
-          <tr>
-            <td class="table-title">Hệ số công suất</td>
-            <td id="s53">Cột 2</td>
-            <td id="s54">Cột 3</td>
-            <td id="s55">Cột 4</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td class="table-title">Nguồn điện sử dụng</td>
-            <td id="s58"></td>
-          </tr>
-          <tr>
-            <td class="table-title">Tần số</td>
-            <td id="s15">Cột 2</td>
-            <td id="s16">Cột 3</td>
-            <td id="s17">Cột 4</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-          </tr>
-          <tr>
-            <td class="table-title">Công suất</td>
-            <td id="s35">Cột 2</td>
-            <td id="s36">Cột 3</td>
-            <td id="s37">Cột 4</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-          </tr>
-
-          <tr>
-            <td rowspan="7" class="highlighted-category table-title">
-              Điện DC
-            </td>
-            <td colspan="2" class="table-title">Điện áp</td>
-            <td colspan="2" class="table-title">Dòng điện</td>
-            <td colspan="2" class="table-title">Công suất</td>
-            <td colspan="2" class="table-title">Nhiệt độ</td>
-            <td colspan="2" class="table-title">Điều khiển</td>
-          </tr>
-          <tr>
-            <td class="table-title">Tủ nguồn 1</td>
-            <td id="s300">Cột 2</td>
-            <td class="table-title">Thiết bị 1</td>
-            <td id="s305">Cột 4</td>
-            <td class="table-title">Tủ nguồn 1</td>
-            <td id="s312">Cột 6</td>
-            <td class="table-title">Tủ nguồn 1</td>
-            <td id="s310">Cột 8</td>
-            <td class="table-title">Tủ nguồn 1</td>
-            <td id="s290">
-              <label class="switch">
-                <input
-                  type="checkbox"
-                  id="input_s290"
-                  onclick="changeStatus(this);"
-                />
-                <span class="slider round"></span>
-              </label>
-            </td>
-          </tr>
-          <tr>
-            <td class="table-title">Tủ nguồn 2</td>
-            <td id="s301">Cột 2</td>
-            <td class="table-title">Thiết bị 2</td>
-            <td id="s306">Cột 4</td>
-            <td class="table-title">Tủ nguồn 2</td>
-            <td id="s313">Cột 6</td>
-            <td class="table-title">Tủ nguồn 2</td>
-            <td id="s311">Cột 8</td>
-            <td class="table-title">Tủ nguồn 2</td>
-            <td id="s291">
-              <label class="switch">
-                <input
-                  type="checkbox"
-                  id="input_s291"
-                  onclick="changeStatus(this);"
-                />
-                <span class="slider round"></span>
-              </label>
-            </td>
-          </tr>
-          <tr>
-            <td class="table-title">Tủ nguồn 3</td>
-            <td id="s302">Cột 2</td>
-            <td class="table-title">Thiết bị 3</td>
-            <td id="s307">Cột 4</td>
-            <td class="table-title">Tủ nguồn 3</td>
-            <td id="s314">Cột 6</td>
-            <td class="table-title">Tủ nguồn 3</td>
-            <td id="s326">Cột 8</td>
-            <td class="table-title">Tủ nguồn 3</td>
-            <td id="s292">
-              <label class="switch">
-                <input
-                  type="checkbox"
-                  id="input_s292"
-                  onclick="changeStatus(this);"
-                />
-                <span class="slider round"></span>
-              </label>
-            </td>
-          </tr>
-          <tr>
-            <td class="table-title">Tủ nguồn 4</td>
-            <td id="s303">Cột 2</td>
-            <td class="table-title">Thiết bị 4</td>
-            <td id="s308">Cột 4</td>
-            <td class="table-title">Tủ nguồn 4</td>
-            <td id="s315">Cột 6</td>
-            <td class="table-title">Tủ nguồn 4</td>
-            <td id="s331">Cột 8</td>
-            <td class="table-title">Tủ nguồn 4</td>
-            <td id="s293">
-              <label class="switch">
-                <input
-                  type="checkbox"
-                  id="input_s293"
-                  onclick="changeStatus(this);"
-                />
-                <span class="slider round"></span>
-              </label>
-            </td>
-          </tr>
-          <tr>
-            <td></td>
-            <td></td>
-            <td class="table-title">Thiết bị 5</td>
-            <td id="s309"></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-          </tr>
-          <tr>
-            <td></td>
-            <td></td>
-            <td class="table-title">Thiết bị 6</td>
-            <td id="s304"></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-          </tr>
-          <tr>
-            <td rowspan="5" class="highlighted-category table-title">
-              Điều hòa
-            </td>
-            <td colspan="2" class="table-title">Nhiệt độ</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td colspan="3" data-exclude="true" class="table-title">
-              Điều khiển
-            </td>
-          </tr>
-          <tr>
-            <td class="table-title">Điều hòa 1</td>
-            <td id="s700">Cột 2</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td data-exclude="true" id="s720">
-              <label class="switch">
-                <input
-                  type="checkbox"
-                  id="input_s720"
-                  onclick="changeStatus(this);"
-                />
-                <span class="slider round"></span>
-              </label>
-            </td>
-            <td data-exclude="true" id="s728">
-              <div
-                class="value-button"
-                id="decrease_s700"
-                onclick="decreaseValue(this)"
-                value="Decrease Value"
-              >
-                -
-              </div>
-              <div
-                class="value-button"
-                id="increase_s700"
-                onclick="increaseValue(this)"
-                value="Increase Value"
-              >
-                +
-              </div>
-            </td>
-          </tr>
-          <tr>
-            <td class="table-title">Điều hòa 2</td>
-            <td id="s701">Cột 2</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td data-exclude="true" id="s721">
-              <label class="switch">
-                <input
-                  type="checkbox"
-                  id="input_s721"
-                  onclick="changeStatus(this);"
-                />
-                <span class="slider round"></span>
-              </label>
-            </td>
-            <td data-exclude="true" id="s729">
-              <div
-                class="value-button"
-                id="decrease_s701"
-                onclick="decreaseValue(this)"
-                value="Decrease Value"
-              >
-                -
-              </div>
-              <div
-                class="value-button"
-                id="increase_s701"
-                onclick="increaseValue(this)"
-                value="Increase Value"
-              >
-                +
-              </div>
-            </td>
-          </tr>
-          <tr>
-            <td class="table-title">Điều hòa 3</td>
-            <td id="s702">Cột 2</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td data-exclude="true" id="s722">
-              <label class="switch">
-                <input
-                  type="checkbox"
-                  id="input_s722"
-                  onclick="changeStatus(this);"
-                />
-                <span class="slider round"></span>
-              </label>
-            </td>
-            <td data-exclude="true" id="s730">
-              <div
-                class="value-button"
-                id="decrease_s702"
-                onclick="decreaseValue(this)"
-                value="Decrease Value"
-              >
-                -
-              </div>
-              <div
-                class="value-button"
-                id="increase_s702"
-                onclick="increaseValue(this)"
-                value="Increase Value"
-              >
-                +
-              </div>
-            </td>
-          </tr>
-          <tr>
-            <td class="table-title">Điều hòa 4</td>
-            <td id="s703">Cột 2</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td data-exclude="true" id="s723">
-              <label class="switch">
-                <input
-                  type="checkbox"
-                  id="input_s723"
-                  onclick="changeStatus(this);"
-                />
-                <span class="slider round"></span>
-              </label>
-            </td>
-            <td data-exclude="true" id="s731">
-              <div
-                class="value-button"
-                id="decrease_s703"
-                onclick="decreaseValue(this)"
-                value="Decrease Value"
-              >
-                -
-              </div>
-              <div
-                class="value-button"
-                id="increase_s703"
-                onclick="increaseValue(this)"
-                value="Increase Value"
-              >
-                +
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+            <tr>
+              <td rowspan="7" class="highlighted-category-2 table-title-1">
+                Điện<br /><br />DC
+              </td>
+              <td colspan="2" class="table-title-2 dc">Điện áp (V)</td>
+              <td colspan="2" class="table-title-2 dc">Dòng điện (A)</td>
+              <td colspan="2" class="table-title-2 dc">Công suất (W)</td>
+              <td colspan="2" class="table-title-2 dc">Nhiệt độ (&deg;C)</td>
+              <td colspan="2" class="table-title-2 dc">Điều khiển</td>
+            </tr>
+            <tr>
+              <td class="dc">Tủ nguồn 1</td>
+              <td id="s300" class="dc">Cột 2</td>
+              <td class="dc">Thiết bị 1</td>
+              <td id="s305" class="dc">Cột 4</td>
+              <td class="dc">Tủ nguồn 1</td>
+              <td id="s312" class="dc">Cột 6</td>
+              <td class="dc">Tủ nguồn 1</td>
+              <td id="s310" class="dc">Cột 8</td>
+              <td class="dc">Tủ nguồn 1</td>
+              <td id="s290" class="dc none">
+                <label class="switch">
+                  <input
+                    type="checkbox"
+                    id="input_s290"
+                    onclick="changeStatus(this);"
+                  />
+                  <span class="slider round"></span>
+                </label>
+              </td>
+            </tr>
+            <tr>
+              <td class="dc">Tủ nguồn 2</td>
+              <td id="s301" class="dc">Cột 2</td>
+              <td class="dc">Thiết bị 2</td>
+              <td id="s306" class="dc">Cột 4</td>
+              <td class="dc">Tủ nguồn 2</td>
+              <td id="s313" class="dc">Cột 6</td>
+              <td class="dc">Tủ nguồn 2</td>
+              <td id="s311" class="dc">Cột 8</td>
+              <td class="dc">Tủ nguồn 2</td>
+              <td id="s291" class="dc none">
+                <label class="switch">
+                  <input
+                    type="checkbox"
+                    id="input_s291"
+                    onclick="changeStatus(this);"
+                  />
+                  <span class="slider round"></span>
+                </label>
+              </td>
+            </tr>
+            <tr>
+              <td class="dc">Tủ nguồn 3</td>
+              <td id="s302" class="dc">Cột 2</td>
+              <td class="dc">Thiết bị 3</td>
+              <td id="s307" class="dc">Cột 4</td>
+              <td class="dc">Tủ nguồn 3</td>
+              <td id="s314" class="dc">Cột 6</td>
+              <td class="dc">Tủ nguồn 3</td>
+              <td id="s326" class="dc">Cột 8</td>
+              <td class="dc">Tủ nguồn 3</td>
+              <td id="s292" class="dc none">
+                <label class="switch">
+                  <input
+                    type="checkbox"
+                    id="input_s292"
+                    onclick="changeStatus(this);"
+                  />
+                  <span class="slider round"></span>
+                </label>
+              </td>
+            </tr>
+            <tr>
+              <td class="dc">Tủ nguồn 4</td>
+              <td id="s303" class="dc">Cột 2</td>
+              <td class="dc">Thiết bị 4</td>
+              <td id="s308" class="dc">Cột 4</td>
+              <td class="dc">Tủ nguồn 4</td>
+              <td id="s315" class="dc">Cột 6</td>
+              <td class="dc">Tủ nguồn 4</td>
+              <td id="s331" class="dc">Cột 8</td>
+              <td class="dc">Tủ nguồn 4</td>
+              <td id="s293" class="dc">
+                <label class="switch none">
+                  <input
+                    type="checkbox"
+                    id="input_s293"
+                    onclick="changeStatus(this);"
+                  />
+                  <span class="slider round"></span>
+                </label>
+              </td>
+            </tr>
+            <tr>
+              <td class="dc"></td>
+              <td class="dc"></td>
+              <td class="dc">Thiết bị 5</td>
+              <td id="s309" class="dc"></td>
+              <td class="dc"></td>
+              <td class="dc"></td>
+              <td class="dc"></td>
+              <td class="dc"></td>
+              <td class="dc"></td>
+              <td class="dc"></td>
+            </tr>
+            <tr>
+              <td class="dc"></td>
+              <td class="dc"></td>
+              <td class="dc">Thiết bị 6</td>
+              <td id="s304" class="dc"></td>
+              <td class="dc"></td>
+              <td class="dc"></td>
+              <td class="dc"></td>
+              <td class="dc"></td>
+              <td class="dc"></td>
+              <td class="dc"></td>
+            </tr>
+            <tr>
+              <td rowspan="5" class="highlighted-category table-title-1">
+                Điều<br /><br />hòa
+              </td>
+              <td colspan="2" class="table-title-2 ac">Nhiệt độ</td>
+              <td class="ac"></td>
+              <td class="ac"></td>
+              <td class="ac"></td>
+              <td class="ac"></td>
+              <td class="ac"></td>
+              <td class="ac"></td>
+              <td colspan="3" data-exclude="true" class="table-title-2 ac">
+                Điều khiển
+              </td>
+            </tr>
+            <tr>
+              <td class="ac">Điều hòa 1</td>
+              <td id="s700" class="ac">Cột 2</td>
+              <td class="ac"></td>
+              <td class="ac"></td>
+              <td class="ac"></td>
+              <td class="ac"></td>
+              <td class="ac"></td>
+              <td class="ac"></td>
+              <td data-exclude="true" id="s720" class="ac none">
+                <label class="switch">
+                  <input
+                    type="checkbox"
+                    id="input_s720"
+                    onclick="changeStatus(this);"
+                  />
+                  <span class="slider round"></span>
+                </label>
+              </td>
+              <td data-exclude="true" id="s728" class="ac none">
+                <div
+                  class="value-button"
+                  id="decrease_s700"
+                  onclick="decreaseValue(this)"
+                  value="Decrease Value"
+                >
+                  -
+                </div>
+                <div
+                  class="value-button"
+                  id="increase_s700"
+                  onclick="increaseValue(this)"
+                  value="Increase Value"
+                >
+                  +
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td class="ac">Điều hòa 2</td>
+              <td id="s701" class="ac">Cột 2</td>
+              <td class="ac"></td>
+              <td class="ac"></td>
+              <td class="ac"></td>
+              <td class="ac"></td>
+              <td class="ac"></td>
+              <td class="ac"></td>
+              <td data-exclude="true" id="s721" class="ac none">
+                <label class="switch">
+                  <input
+                    type="checkbox"
+                    id="input_s721"
+                    onclick="changeStatus(this);"
+                  />
+                  <span class="slider round"></span>
+                </label>
+              </td>
+              <td data-exclude="true" id="s729" class="ac none">
+                <div
+                  class="value-button"
+                  id="decrease_s701"
+                  onclick="decreaseValue(this)"
+                  value="Decrease Value"
+                >
+                  -
+                </div>
+                <div
+                  class="value-button"
+                  id="increase_s701"
+                  onclick="increaseValue(this)"
+                  value="Increase Value"
+                >
+                  +
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td class="ac">Điều hòa 3</td>
+              <td id="s702" class="ac">Cột 2</td>
+              <td class="ac"></td>
+              <td class="ac"></td>
+              <td class="ac"></td>
+              <td class="ac"></td>
+              <td class="ac"></td>
+              <td class="ac"></td>
+              <td data-exclude="true" id="s722" class="ac none">
+                <label class="switch">
+                  <input
+                    type="checkbox"
+                    id="input_s722"
+                    onclick="changeStatus(this);"
+                  />
+                  <span class="slider round"></span>
+                </label>
+              </td>
+              <td data-exclude="true" id="s730" class="ac none">
+                <div
+                  class="value-button"
+                  id="decrease_s702"
+                  onclick="decreaseValue(this)"
+                  value="Decrease Value"
+                >
+                  -
+                </div>
+                <div
+                  class="value-button"
+                  id="increase_s702"
+                  onclick="increaseValue(this)"
+                  value="Increase Value"
+                >
+                  +
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td class="ac">Điều hòa 4</td>
+              <td id="s703" class="ac">Cột 2</td>
+              <td class="ac"></td>
+              <td class="ac"></td>
+              <td class="ac"></td>
+              <td class="ac"></td>
+              <td class="ac"></td>
+              <td class="ac"></td>
+              <td data-exclude="true" id="s723" class="ac none">
+                <label class="switch">
+                  <input
+                    type="checkbox"
+                    id="input_s723"
+                    onclick="changeStatus(this);"
+                  />
+                  <span class="slider round"></span>
+                </label>
+              </td>
+              <td data-exclude="true" id="s731" class="ac none">
+                <div
+                  class="value-button"
+                  id="decrease_s703"
+                  onclick="decreaseValue(this)"
+                  value="Decrease Value"
+                >
+                  -
+                </div>
+                <div
+                  class="value-button"
+                  id="increase_s703"
+                  onclick="increaseValue(this)"
+                  value="Increase Value"
+                >
+                  +
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+    <footer>
+      <nav class="nav-footer">
+        <div class="nav-links-container">
+          <ul class="nav-links">
+            <li><a href="#about">About</a></li>
+            <li><a href="#experience">Experience</a></li>
+            <li><a href="#projects">Projects</a></li>
+            <li><a href="#contact">Contact</a></li>
+          </ul>
+        </div>
+      </nav>
+      <p>Copyright &#169; 2023 Nguyen Quang. All Rights Reserved.</p>
+    </footer>
   </body>
   <script>
     let socket = io("http://178.128.113.184:8081");
@@ -621,19 +653,69 @@
     exportBtn.addEventListener("click", function () {
       var table = document.querySelector(".table-content");
       var virtualTable = table.cloneNode(true);
-      // var thead = table.querySelector("thead");
-      var virtualThead = virtualTable.querySelector("thead");
 
+      var virtualThead = document.createElement("thead");
       // Tạo một dòng mới trong thead ảo
       var newRow = document.createElement("tr");
       var newCell = document.createElement("th");
       newCell.colSpan = 11;
-      newCell.className = "table-title station_id";
+      newCell.className = "station_id";
       newCell.textContent = document.getElementById("server_time").textContent;
       newRow.appendChild(newCell);
+      console.log(newRow);
+      console.log(virtualThead);
       virtualThead.appendChild(newRow);
 
       TableToExcel.convert(virtualTable);
     });
+
+    //Update device
+    var updateBtn = document.getElementById("updateButton");
+
+    updateBtn.addEventListener("click", () => {
+      axios
+        .get("http://178.128.113.184:8081/update_device", {
+          headers: {
+            "auth-token": localStorage.getItem("auth-token"),
+            device_id,
+          },
+        })
+        .then((response) => {
+          console.log(response);
+        })
+        .catch((error) => {
+          if (error) {
+            console.log(error);
+          } else {
+            console.log(error.message);
+          }
+        });
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+      var cells = document.querySelectorAll(".table-content td:not(.none)");
+
+      cells.forEach(function (cell) {
+        cell.addEventListener("mouseover", function () {
+          // Kiểm tra xem có class none không
+          if (!cell.classList.contains("none")) {
+            // Nếu không có class none, thêm class highlighted
+            cell.classList.add("highlighted");
+          }
+        });
+
+        cell.addEventListener("mouseout", function () {
+          // Loại bỏ class highlighted khi di chuột ra khỏi ô
+          cell.classList.remove("highlighted");
+        });
+      });
+    });
+
+    function toggleMenu() {
+      const menu = document.querySelector(".menu-links");
+      const icon = document.querySelector(".hamburger-icon");
+      menu.classList.toggle("open");
+      icon.classList.toggle("open");
+    }
   </script>
 </html>

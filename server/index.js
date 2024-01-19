@@ -12,6 +12,9 @@ const io = require("socket.io")(server, {
 const mqtt = require("mqtt");
 const cors = require("cors");
 var bodyParser = require("body-parser");
+const fileUpload = require("express-fileupload");
+const AdmZip = require("adm-zip");
+const md5 = require("md5");
 
 //token-id
 const crypto = require("crypto");
@@ -30,7 +33,7 @@ const shortId = require("shortid");
 const { Pool } = require("pg");
 const pool = new Pool({
   user: "postgres",
-  host: "178.128.113.184",
+  host: "localhost",
   database: "tbnet_smartsite",
   password: "123456",
   port: 5432,
@@ -87,6 +90,8 @@ server.listen(port_server, async () => {
   await pool.query(process.env.CREATE_DEVICE);
   await pool.query(process.env.CREATE_DEVICE_DATA);
   await pool.query(process.env.CREATE_USERS);
+  await pool.query(process.env.CREATE_INF_OTA);
+
   let SQL1 = "SELECT * FROM users WHERE login_user=$1;";
   const check_user = await pool.query(SQL1, ["minhquangbvmi@gmail.com"]);
   // console.log(check_user);
@@ -179,12 +184,12 @@ client.on("message", async (topic_mqtt, message) => {
 io.on("connection", (clientWeb) => {
   clientWeb.on("CurrentControl", async (data) => {
     console.log(data);
-    // let SQL =
-    //   "UPDATE device_data SET " +
-    //   data.key +
-    //   "= $1 WHERE device_id = $2 AND id = (SELECT MAX(id) FROM device_data WHERE device_id = $3);";
-    // await pool.query(SQL, [data.value, data.device_id, data.device_id]);
-    // sendToDevice(data.device_id + "/control", data);
+    let SQL =
+      "UPDATE device_data SET " +
+      data.key +
+      "= $1 WHERE device_id = $2 AND id = (SELECT MAX(id) FROM device_data WHERE device_id = $3);";
+    await pool.query(SQL, [data.value, data.device_id, data.device_id]);
+    sendToDevice(data.device_id + "/control", data);
   });
 });
 
@@ -195,6 +200,7 @@ sendDataToClient = async (topic, msg) => {
 
 sendToDevice = async (topic, message) => {
   let data = JSON.stringify(message);
+  console.log(topic);
   console.log(data);
   await client.publish(topic, data);
 };
@@ -248,6 +254,11 @@ app.get("/stations/:device_id", tokenIsValid, async (req, res) => {
   // var status_currentcontrol = device.rows[0].status;
   return res.status(200).json({ lastValue });
 });
+
+// app.get("/login", (req, res) => {
+//   console.log("login");
+//   res.sendFile(__dirname + "/public/login.html");
+// });
 
 app.post("/login", async (req, res) => {
   var { username, password } = req.body;
@@ -357,4 +368,115 @@ app.post("/getserial", async (req, res) => {
   } else {
     res.json("Send your name of model");
   }
+});
+
+//upload and download
+app.get("/ota", (req, res) => {
+  res.sendFile(__dirname + "/public/ota.html");
+});
+
+// Decrypting text
+function decrypt(encryptedData) {
+  const password = "tbnet_host_key_password_checkqe";
+  const iv = Buffer.alloc(16);
+  let data = crypto.createHash("sha256").update(password).digest("hex");
+  let encryptedText = Buffer.from(encryptedData, "hex");
+  let decipher = crypto.createDecipheriv(
+    "aes-256-cbc",
+    Buffer.from(data, "hex"),
+    iv
+  );
+  let decrypted = decipher.update(encryptedText);
+  decrypted = Buffer.concat([decrypted, decipher.final()]);
+  return decrypted.toString();
+}
+
+// Passing fileUpload as a middleware
+app.use(fileUpload());
+// For handling the upload request
+app.post("/upload_mcc", function (req, res) {
+  if (req.files && Object.keys(req.files).length !== 0) {
+    const uploadedFile = req.files.uploadFile;
+
+    // Check if the file has a .zip extension
+    if (path.extname(uploadedFile.name).toLowerCase() !== ".zip") {
+      return res.status(400).send("Only .zip files are allowed.");
+    }
+
+    const uploadPath = path.join(__dirname, "ota_mcc", uploadedFile.name);
+    const fileSize = uploadedFile.size;
+    const fileSizeMD5 = md5(fileSize.toString());
+    const zipFileName = uploadedFile.name;
+
+    uploadedFile.mv(uploadPath, async function (err) {
+      if (err) {
+        console.log(err);
+        return res.status(500).send("Failed to upload the ZIP file.");
+      }
+
+      // Extract the contents of the ZIP file
+      const zip = new AdmZip(uploadPath);
+      const zipEntries = zip.getEntries();
+
+      // Find and read the JSON file
+      const jsonFile = zipEntries.find(
+        (entry) => path.extname(entry.entryName).toLowerCase() === ".json"
+      );
+
+      if (jsonFile) {
+        const jsonDataText = zip.readAsText(jsonFile);
+        const jsonData = JSON.parse(jsonDataText);
+
+        var SQL =
+          "INSERT INTO inf_ota (hw_version,system_version,build_date,target_device,signature_info,system_md5,zip_md5,zip_name ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8);";
+
+        await pool.query(SQL, [
+          jsonData.hw_version,
+          jsonData.system_version,
+          jsonData.build_date,
+          jsonData.target_device,
+          jsonData.signature_info,
+          jsonData.system_md5,
+          fileSizeMD5,
+          zipFileName,
+        ]);
+
+        res.status(200).send("Successfully Uploaded and Processed JSON Data!!");
+      } else {
+        res.status(400).send("No .json file found in the ZIP archive.");
+      }
+    });
+  } else {
+    res.status(400).send("No file uploaded !!");
+  }
+});
+
+app.get("/update_device", async function (req, res) {
+  const device_id = req.headers["device_id"];
+  const query = "SELECT * FROM inf_ota ORDER BY id DESC LIMIT 1";
+  const inf_ota = await pool.query(query);
+  const data = {
+    serial_number: device_id,
+    file_name: inf_ota.rows[0].zip_name,
+    version: inf_ota.rows[0].system_version,
+    target_device: inf_ota.rows[0].target_device,
+  };
+  sendToDevice(device_id + "/update_ota", data);
+  res.status(200).send("OK");
+});
+
+app.get("/ota_mcc", function (req, res) {
+  // console.log(req.header.auth_code);
+
+  let code = req.header("auth_code");
+  let file_name = req.header("file_name");
+  let decript_data = decrypt(code);
+  console.log(decript_data);
+  // The res.download() talking file path to be downloaded
+  const filePath = path.join(__dirname, "ota_mcc", file_name);
+  res.download(filePath, function (err) {
+    if (err) {
+      console.log(err);
+    }
+  });
 });

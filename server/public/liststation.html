@@ -10,31 +10,73 @@
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   </head>
   <body>
-    <div class="header-table">
-      <div class="header-container">
-        <h1>Danh sách trạm</h1>
-        <div class="button-logout">
-          <button class="custom-button-fill" id="logoutButton">
-            <span class="button-fill-text">Logout</span>
-          </button>
+    <nav id="desktop-nav">
+      <div class="logo">TB-NET</div>
+      <div>
+        <ul class="nav-links">
+          <li><a href="#about">About</a></li>
+          <li><a href="#experience">Experience</a></li>
+          <li><a href="#projects">Projects</a></li>
+          <li><a href="#contact">Back</a></li>
+        </ul>
+      </div>
+    </nav>
+    <nav id="hamburger-nav">
+      <div class="logo">TB-NET</div>
+      <div class="hamburger-menu">
+        <div class="hamburger-icon" onclick="toggleMenu()">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+        <div class="menu-links">
+          <li><a href="#about" onclick="toggleMenu()">About</a></li>
+          <li><a href="#experience" onclick="toggleMenu()">Experience</a></li>
+          <li><a href="#projects" onclick="toggleMenu()">Projects</a></li>
+          <li><a href="#contact" onclick="toggleMenu()">Contact</a></li>
         </div>
       </div>
-    </div>
-
-    <div class="body-table">
-      <div class="div-search"><input type="text" id="search-input" /></div>
-      <div class="div-table">
-        <table id="customers">
-          <tr class="header">
-            <th>Mã trạm</th>
-            <th>Khu vực</th>
-            <th>Cảnh báo</th>
-          </tr>
-        </table>
+    </nav>
+    <section id="profile">
+      <div class="logo">Danh sách trạm</div>
+      <div class="div-search">
+        <input type="text" id="search-input" />
+        <p class="section__text__p1">Nhập tìm kiếm</p>
       </div>
-    </div>
+      <div class="body-table">
+        <div class="div-table">
+          <table id="customers">
+            <tr class="header">
+              <th>Mã trạm</th>
+              <th>Khu vực</th>
+              <th>Cảnh báo</th>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </section>
+    <footer>
+      <nav class="nav-footer">
+        <div class="nav-links-container">
+          <ul class="nav-links">
+            <li><a href="#about">About</a></li>
+            <li><a href="#experience">Experience</a></li>
+            <li><a href="#projects">Projects</a></li>
+            <li><a href="#contact">Contact</a></li>
+          </ul>
+        </div>
+      </nav>
+      <p>Copyright &#169; 2023 Nguyen Quang. All Rights Reserved.</p>
+    </footer>
   </body>
   <script>
+    function toggleMenu() {
+      const menu = document.querySelector(".menu-links");
+      const icon = document.querySelector(".hamburger-icon");
+      menu.classList.toggle("open");
+      icon.classList.toggle("open");
+    }
+
     //Get list stations from database - collection "listStations"
     getListStations = async () => {
       console.log("HTTP GET with Axios");
