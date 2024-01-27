@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <base href="http://178.128.113.184:8081/public/" target="_parent" />
+    <link rel="stylesheet" href="style/liststation.css" />
+    <link rel="shortcut icon" href="img/logo-web.png" />
+    <title>TB NET - List Station</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  </head>
+  <body>
+    <nav id="desktop-nav">
+      <div class="logo">TB-NET</div>
+      <div>
+        <ul class="nav-links">
+          <li><a href="#about">About</a></li>
+          <li><a href="#experience">Experience</a></li>
+          <li><a href="#projects">Projects</a></li>
+          <li><a href="#contact">Back</a></li>
+        </ul>
+      </div>
+    </nav>
+    <nav id="hamburger-nav">
+      <div class="logo">TB-NET</div>
+      <div class="hamburger-menu">
+        <div class="hamburger-icon" onclick="toggleMenu()">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+        <div class="menu-links">
+          <li><a href="#about" onclick="toggleMenu()">About</a></li>
+          <li><a href="#experience" onclick="toggleMenu()">Experience</a></li>
+          <li><a href="#projects" onclick="toggleMenu()">Projects</a></li>
+          <li><a href="#contact" onclick="toggleMenu()">Contact</a></li>
+        </div>
+      </div>
+    </nav>
+    <section id="profile">
+      <div class="logo">Danh sách trạm</div>
+      <div class="div-search">
+        <input type="text" id="search-input" />
+        <p class="section__text__p1">Nhập tìm kiếm</p>
+      </div>
+
+      <div class="f-group">
+        <label>Dòng AC ngưỡng (A)</label>
+        <select id="currentACThreshold">
+          <option value="" disabled selected>20</option>
+          <option value="15">15</option>
+          <option value="25">25</option>
+          <option value="26">26</option>
+          <option value="27">27</option>
+          <option value="28">28</option>
+          <option value="29">29</option>
+          <option value="30">30</option>
+        </select>
+      </div>
+
+      <div class="body-table">
+        <div class="div-table">
+          <table id="customers">
+            <tr class="header">
+              <th>Mã trạm</th>
+              <th>Khu vực</th>
+              <th>Cảnh báo</th>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </section>
+    <footer>
+      <nav class="nav-footer">
+        <div class="nav-links-container">
+          <ul class="nav-links">
+            <li><a href="#about">About</a></li>
+            <li><a href="#experience">Experience</a></li>
+            <li><a href="#projects">Projects</a></li>
+            <li><a href="#contact">Contact</a></li>
+          </ul>
+        </div>
+      </nav>
+      <p>Copyright &#169; 2023 Nguyen Quang. All Rights Reserved.</p>
+    </footer>
+  </body>
+  <script>
+    function toggleMenu() {
+      const menu = document.querySelector(".menu-links");
+      const icon = document.querySelector(".hamburger-icon");
+      menu.classList.toggle("open");
+      icon.classList.toggle("open");
+    }
+
+    //Get list stations from database - collection "listStations"
+    getListStations = async () => {
+      console.log("HTTP GET with Axios");
+      axios
+        .get("http://178.128.113.184:8081/data-stations", {
+          headers: { "auth-token": localStorage.getItem("auth-token") },
+        })
+        .then((response) => {
+          if (response.data === false) {
+            window.location.href = "login.html";
+          }
+          let listStations = response.data.listStations;
+          let errorsAllStations = response.data.errorsAllStations;
+          const currentACThreshold = response.data.currentACThreshold;
+
+          handleData(listStations, errorsAllStations, currentACThreshold);
+        })
+        .catch((error) => {
+          if (error.response) {
+            console.log(error.reponse.status);
+          } else {
+            console.log(error.message);
+          }
+        });
+    };
+
+    getListStations();
+
+    handleData = async (
+      listStations,
+      errorsAllStations,
+      currentACThreshold
+    ) => {
+      const tableElement = document.getElementById("customers");
+
+      // Xóa danh sách cũ
+      while (tableElement.firstChild) {
+        tableElement.removeChild(tableElement.firstChild);
+      }
+
+      // Đặt giá trị cho thuộc tính value của các option
+      document
+        .querySelectorAll("#currentACThreshold option")
+        .forEach(function (option) {
+          if (option.value === currentACThreshold) {
+            option.selected = true; // Đánh dấu option này là đã chọn
+          }
+        });
+
+      // Tạo hàng tiêu đề
+      const tr = document.createElement("tr");
+      tr.classList.add("header");
+
+      const td1 = document.createElement("th");
+      td1.textContent = "Mã trạm";
+      tr.appendChild(td1);
+
+      const td2 = document.createElement("th");
+      td2.textContent = "Khu vực";
+      tr.appendChild(td2);
+
+      const td3 = document.createElement("th");
+      td3.classList.add("td-error");
+      td3.textContent = "Cảnh báo";
+      tr.appendChild(td3);
+
+      tableElement.appendChild(tr);
+
+      for (const station of listStations) {
+        const tr = document.createElement("tr");
+
+        const td1 = document.createElement("td");
+        const a = document.createElement("a");
+        a.href = "/station/" + station.device_id;
+        a.textContent = station.device_id;
+        a.addEventListener("click", () => {
+          localStorage.setItem("device_id", station.device_id);
+        });
+        td1.appendChild(a);
+
+        const td2 = document.createElement("td");
+        td2.textContent = station.address;
+
+        const td3 = document.createElement("td");
+        td3.classList.add("td-error");
+
+        const errors = errorsAllStations.find(
+          (error) => error.device_id === station.device_id
+        );
+
+        if (errors) {
+          if (errors.err1 == 1) {
+            const spanElement = document.createElement("span");
+            spanElement.classList.add("badge", "badge--danger");
+            spanElement.textContent = "Quá áp AC";
+            td3.appendChild(spanElement);
+          }
+          if (errors.err2 == 1) {
+            const spanElement = document.createElement("span");
+            spanElement.classList.add("badge", "badge--danger");
+            spanElement.textContent = "Quá dòng AC";
+
+            td3.appendChild(spanElement);
+          }
+
+          if (errors.err3 == 1) {
+            const spanElement = document.createElement("span");
+            spanElement.classList.add("badge", "badge--danger");
+            spanElement.textContent = "Mất pha";
+
+            td3.appendChild(spanElement);
+          }
+
+          if (errors.err4 == 1) {
+            const spanElement = document.createElement("span");
+            spanElement.classList.add("badge", "badge--danger");
+            spanElement.textContent = "Quá áp DC";
+
+            td3.appendChild(spanElement);
+          }
+
+          if (errors.err5 == 1) {
+            const spanElement = document.createElement("span");
+            spanElement.classList.add("badge", "badge--danger");
+            spanElement.textContent = "Quá dòng DC";
+
+            td3.appendChild(spanElement);
+          }
+
+          if (errors.err6 == 1) {
+            const spanElement = document.createElement("span");
+            spanElement.classList.add("badge", "badge--danger");
+            spanElement.textContent = "Quá nhiệt";
+
+            td3.appendChild(spanElement);
+          }
+        }
+
+        tr.appendChild(td1);
+        tr.appendChild(td2);
+        tr.appendChild(td3);
+
+        tableElement.appendChild(tr);
+      }
+    };
+
+    //search
+    const searchInput = document.getElementById("search-input");
+    searchInput.addEventListener("keyup", function () {
+      const searchText = searchInput.value.toUpperCase();
+      console.log(searchText);
+      axios
+        .get("http://178.128.113.184:8081/data-stations", {
+          headers: { "auth-token": localStorage.getItem("auth-token") },
+        })
+        .then((response) => {
+          if (response.data === false) {
+            window.location.href = "login.html";
+          }
+
+          let listStations = response.data.listStations;
+          let errorsAllStations = response.data.errorsAllStations;
+
+          const filteredStations = listStations.filter((station) => {
+            return station.device_id.toUpperCase().includes(searchText);
+          });
+
+          const filteredErrors = errorsAllStations.filter((errorStation) => {
+            return errorStation.device_id.toUpperCase().includes(searchText);
+          });
+
+          handleData(filteredStations, filteredErrors);
+        })
+        .catch((error) => {
+          if (error.response) {
+            console.log(error.reponse.status);
+          } else {
+            console.log(error.message);
+          }
+        });
+    });
+
+    //Set ngưỡng
+
+    document
+      .getElementById("currentACThreshold")
+      .addEventListener("change", function () {
+        // Lấy giá trị được chọn
+        const selectedValue = this.value;
+
+        // Gửi giá trị đến server bằng Axios
+        axios
+          .post("/api/setThreshold", { currentACThreshold: selectedValue })
+          .then(function (response) {
+            window.location.reload();
+          })
+          .catch(function (error) {
+            console.error(error);
+          });
+      });
+
+    //logout
+    // var logoutButton = document.getElementById("logoutButton");
+    // logoutButton.addEventListener("click", () => {
+    //   localStorage.removeItem("auth-token");
+    //   window.location.href = "index.html";
+    // });
+  </script>
+</html>
